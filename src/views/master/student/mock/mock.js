@@ -22,7 +22,7 @@ const StudentMock = mock => {
     });
 
     //获取学生列表（分页）
-    mock.onGet('/Student/listpage').reply(config => {
+    mock.onGet('/Student/listPage').reply(config => {
       let {page, name, sex, parentName} = config.params;
       let mockStudents = _Students.filter(student => {
         if (name && student.name.indexOf(name) == -1) return false;

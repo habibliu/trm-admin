@@ -5,7 +5,7 @@ let base = '';
 export const getStudentList = params => { return axios.get(`${base}/Student/list`, { params: params }); };
 
 export const getStudentListPage = params => { 
-  return axios.get(`${base}/Student/listpage`, { params: params }); 
+  return axios.get(`${base}/Student/listPage`, { params: params }); 
 };
 
 export const removeStudent = params => { return axios.get(`${base}/Student/remove`, { params: params }); };

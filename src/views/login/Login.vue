@@ -48,24 +48,23 @@
         this.$refs.ruleForm2.validate((valid) => {
           if (valid) {
             //_this.$router.replace('/table');
-            
             //NProgress.start();
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
             try{
-                debugger;
+                
                 this.logining = true;
-                requestLogin(loginParams).then(data => {
+                requestLogin(loginParams).then(resp => {
                 this.logining = false;
                   //NProgress.done();
-                let { msg, code, user } = data;
-                  if (code !== 200) {
+                let { message, code, data } = resp;
+                  if (code !== '00000') {
                     this.$message({
-                      message: msg,
+                      message: message,
                       type: 'error'
                     });
                   } else {
                     //保存登录用户信息到session中
-                    sessionStorage.setItem('user', JSON.stringify(user));
+                    sessionStorage.setItem('user', JSON.stringify(data));
                     //登录成功后，默认路由到组织架构页面
                     this.$router.push({ path: '/Organization' });
                   }

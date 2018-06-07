@@ -39,7 +39,7 @@ export default {
     });
   
     try{
-      LoginMock(mock);
+      //LoginMock(mock);
       EmployeeMock(mock);
       OrganizationMock(mock);
       DepartmentMock(mock);

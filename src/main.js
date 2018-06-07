@@ -15,6 +15,8 @@ import fullCalendar from 'vue-fullcalendar'
 
 import routes from './routes'
 import Mock from './mock'
+import axios from '@/common/js/AxiosPlugin'
+
 Mock.bootstrap();//启动mock
 
 import 'font-awesome/css/font-awesome.min.css'
@@ -48,7 +50,7 @@ router.beforeEach((to, from, next) => {
 //router.afterEach(transition => {
 //NProgress.done();
 //});
-
+Vue.prototype.$http = axios;
 new Vue({
   //el: '#app',
   //template: '<App/>',

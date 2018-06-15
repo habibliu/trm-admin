@@ -2,7 +2,7 @@
   "name": "trm-admin",
   "version": "1.0.5",
   "description": "trm admin project",
-  "author": "taylor <709161610@qq.com>",
+  "author": "habibliu <740033486@qq.com>",
   "license": "MIT",
   "scripts": {
     "dev": "node build/dev-server.js",

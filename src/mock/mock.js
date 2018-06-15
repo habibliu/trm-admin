@@ -40,7 +40,7 @@ export default {
   
     try{
       //LoginMock(mock);
-      EmployeeMock(mock);
+      //EmployeeMock(mock);
       OrganizationMock(mock);
       DepartmentMock(mock);
       UserMock(mock);

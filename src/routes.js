@@ -159,7 +159,7 @@ export default [
             { path: '/RuleSetting', component: RuleSetting, name: '赠送规则' },
             { path: '/CourseRegistration', component: CourseRegistration, name: '课程报名' },
             { path: '/CourseSchedule', component: CourseSchedule, name: '排期管理' },
-            { path: '/Attendance', component: Attendance, name: '考勤管理' }            
+            { path: '/Attendance', component: Attendance, name: '考勤管理' }
         ]
     },
     {

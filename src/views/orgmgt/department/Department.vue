@@ -134,7 +134,7 @@
         this.editForm.director=this.selectedNode.director;
         this.editForm.telephone=this.selectedNode.telephone;
         this.editForm.addr=this.selectedNode.addr;
-        alert(this.editForm.type);
+       
         this.editFormVisible=true;
         this.addFormVisible=false;
       },

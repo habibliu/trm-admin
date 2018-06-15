@@ -32,7 +32,7 @@ Vue.component('full-calendar', fullCalendar)
 const router = new VueRouter({
   routes
 })
-
+//路由全局守卫，即拦截器
 router.beforeEach((to, from, next) => {
   //NProgress.start();
   if (to.path == '/login') {

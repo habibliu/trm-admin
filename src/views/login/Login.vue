@@ -51,7 +51,6 @@
             //NProgress.start();
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
             try{
-                
                 this.logining = true;
                 requestLogin(loginParams).then(resp => {
                 this.logining = false;
@@ -74,10 +73,8 @@
                 console.log(error);
                 this.logining = false;
             }
-           
           } else {
             console.log('error submit!!');
-           
             return false;
           }
         });

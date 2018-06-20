@@ -35,9 +35,11 @@
       </el-table-column>
       <el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
       </el-table-column>
-      <el-table-column prop="age" label="年龄" width="100" sortable>
+      <el-table-column prop="birthDate" label="生日" width="120"  :formatter="formatBirthDate" sortable>
       </el-table-column>
-      <el-table-column prop="birth" label="生日" width="120" sortable>
+      <el-table-column prop="age" label="年龄" width="100" :formatter="formatAge" sortable>
+      </el-table-column>
+      <el-table-column prop="phone" label="联系电话" width="120" sortable>
       </el-table-column>
       <el-table-column prop="height" label="身高" width="100" sortable>
       </el-table-column>
@@ -45,16 +47,18 @@
       </el-table-column>
       <el-table-column prop="parentName" label="家长姓名" min-width="100" sortable>
       </el-table-column>
-      <el-table-column prop="parentTelephone" label="家长电话" min-width="120" sortable>
+      <el-table-column prop="parentPhone" label="家长电话" min-width="120" sortable>
       </el-table-column>
-      <el-table-column prop="addr" label="地址" min-width="180" sortable>
+      <el-table-column prop="address" label="地址" min-width="180" sortable>
       </el-table-column>
-      <el-table-column label="操作" width="150">
-        <template scope="scope">
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+
+      <el-table-column label="操作" width="150" fixed="right">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button type="text" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
+
     </el-table>
 
     <!--底部工具条-->
@@ -78,11 +82,11 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentTelephone">
+            <el-form-item label="手机号" prop="parentPhone">
               <el-input v-model="editForm.telephone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
               <el-input-number v-model="editForm.age" :disabled=true></el-input-number>
@@ -114,8 +118,8 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentTelephone">
-              <el-input v-model="editForm.parentTelephone" placeholder="家长手机号码"></el-input>
+            <el-form-item label="手机号" prop="parentPhone">
+              <el-input v-model="editForm.parentPhone" placeholder="家长手机号码"></el-input>
             </el-form-item>
             <el-form-item label="微信号">
               <el-input v-model="editForm.parentWx" placeholder="家长微信号码"></el-input>
@@ -140,7 +144,7 @@
         </el-row>
         
         <el-form-item label="地址">
-          <el-input type="textarea" v-model="editForm.addr"></el-input>
+          <el-input type="textarea" v-model="editForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -151,37 +155,79 @@
 
     <!--新增界面-->
     <el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false" width="60%">
-      <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">handleCurrentChange
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="addForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-radio-group v-model="addForm.sex">
-            <el-radio class="radio" :label="1">男</el-radio>
-            <el-radio class="radio" :label="0">女</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="生日">
-          <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="电话" prop="parentTelephone">
-          <el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
-        </el-form-item>
-        <el-form-item label="家长" prop="parentName">
-          <el-select v-model="addForm.parent" filterable placeholder="请选择" >
-            <el-option
-              v-for="item in parents"
-              :key="item.id"
-              :label="item.name + (item.sex==1?' 男 ':' 女 ') + item.telephone"
-              :value="item.id">
-              <span style="float: left">{{ item.name }}</span>
-              <span style="padding-left: 40px;">{{ item.sex==1?'男':'女' }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.telephone }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
+      <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+        <el-row :gutter="20">
+          <el-col :span="8"><div class="grid-content bg-purple"></div>
+            <el-form-item label="学员姓名" prop="name">
+              <el-input v-model="addForm.name" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="性别">
+              <el-radio-group v-model="addForm.sex">
+                <el-radio class="radio" :label="1">男</el-radio>
+                <el-radio class="radio" :label="0">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="手机号" prop="parentPhone">
+              <el-input v-model="addForm.telephone" placeholder="学员手机号码"></el-input>
+            </el-form-item>
+            <el-form-item label="生日">
+              <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birthDate"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="年龄">
+              <el-input-number v-model="addForm.age" :disabled=true></el-input-number>
+            </el-form-item>
+            <el-form-item label="身高">
+              <el-input-number v-model="addForm.height" ></el-input-number>
+            </el-form-item>
+            <el-form-item label="就读学校">
+              <el-select v-model="addForm.school" filterable placeholder="请选择">
+                <el-option
+                  :remote-method="getSchools"
+                  :loading="loading"
+                  v-for="item in schools"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8"><div class="grid-content bg-purple"></div>
+            <el-form-item label="家长姓名" prop="parentName">
+              <el-input v-model="addForm.parentName" filterable placeholder="请输入家姓名" ></el-input>
+            </el-form-item>
+            <el-form-item label="性别">
+              <el-radio-group v-model="addForm.parentSex">
+                <el-radio class="radio" :label="1">男</el-radio>
+                <el-radio class="radio" :label="0">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="手机号" prop="parentPhone">
+              <el-input v-model="addForm.parentPhone" placeholder="家长手机号码"></el-input>
+            </el-form-item>
+            <el-form-item label="微信号">
+              <el-input v-model="addForm.parentWx" placeholder="家长微信号码"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <div class="grid-content bg-purple"></div>
+            <div class="face-pic-preview">
+              <img :src="faceImage" ref="img"></img>
+            </div>
+            <input @change="readFacePic" class="upload-pic-input" ref="uploadFacePicInput" type="file" accept="image/jpeg">
+            <div class="face-pic-operation">
+              <el-button type="primary" @click="onAddPhoto" size="mini">本机上传</el-button>
+            </div>
+            <div class="tips">
+              <span>上传说明：</span>
+              <p>图片应保持五官端正，面部清晰可见</P>
+              <p>图片推荐尺寸206*206</p>
+              <p>只支持JPG格式，文件大小200Kb以内</P>
+            </div>
+          </el-col>
+        </el-row>
         <el-form-item label="地址">
-          <el-input type="textarea" v-model="addForm.addr"></el-input>
+          <el-input type="textarea" v-model="addForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -193,11 +239,10 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
+  import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
   import defaultPicture from './assets/images/james1.jpg'
   import { getStudentListPage, removeStudent, batchRemoveStudent, editStudent, addStudent, getSchoolList } from './api';
-
   export default {
     data() {
       return {
@@ -222,7 +267,7 @@
           parentName: [
             { required: true, message: '请输入家长姓名', trigger: 'blur' }
           ],
-          parentTelephone: [
+          parentPhone: [
             { required: true, message: '请输入家长手机号', trigger: 'blur' }
           ]
         },
@@ -232,14 +277,14 @@
           name: '',
           sex: -1,
           age: 0,
-          birth: '',
-          addr: '',
+          birthDate: '',
+          address: '',
           telphone: '',
           school: '',
           image: '',
           height: '',
           parentName: '',
-          parentTelephone: '',
+          parentPhone: '',
           parentSex: '',
           parentWx: '',
         },
@@ -259,13 +304,16 @@
           name: '',
           sex: -1,
           age: 0,
-          birth: '',
-          addr: '',
-          parent: '',
+          birthDate: '',
+          address: '',
           telphone: '',
           school: '',
           image: '',
           height: '',
+          parentName: '',
+          parentPhone: '',
+          parentSex: '',
+          parentWx: '',
         }
 
       }
@@ -274,6 +322,12 @@
       //性别显示转换
       formatSex: function (row, column) {
         return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
+      },
+      formatBirthDate: function(row,column){
+        return  formatDate(row.birthDate,"yyyy-MM-dd");
+      },
+      formatAge:function(row,column){
+        return calAge(row.birthDate);
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -285,14 +339,13 @@
           page: this.page,
           name: this.filters.name,
           sex: this.filters.sex,
-          parent: this.filters.parent
+          parent: this.filters.parentName
         };
         this.listLoading = true;
         getStudentListPage(para).then((res) => {
           if( res && res.data){
             this.total = res.data.total;
-            this.students = res.data.students;
-          
+            this.students = res.data.rows;
           }
           this.listLoading = false;
         }).catch((error) => {
@@ -346,13 +399,7 @@
       handleAdd: function () {
         this.getSchools();
         this.addFormVisible = true;
-        this.addForm = {
-          name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
-        };
+        this.$refs['addForm'].resetFields();
       },
       //编辑
       editSubmit: function () {
@@ -362,7 +409,7 @@
               this.editLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              para.birthDate = (!para.birthDate || para.birthDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
               editStudent(para).then((res) => {
                 this.editLoading = false;
                 //NProgress.done();
@@ -386,7 +433,8 @@
               this.addLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              debugger;
+              para.birthDate = (!para.birthDate || para.birthDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
               addStudent(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();
@@ -397,6 +445,9 @@
                 this.$refs['addForm'].resetFields();
                 this.addFormVisible = false;
                 this.getStudents();
+              }).catch((error) => {
+                this.addLoading = false;
+                console.log(error);
               });
             });
           }
@@ -415,7 +466,6 @@
           //NProgress.start();
           let para = { ids: ids };
           batchRemoveStudent(para).then((res) => {
-            
             //NProgress.done();
             this.$message({
               message: '删除成功',

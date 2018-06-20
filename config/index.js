@@ -31,7 +31,11 @@ module.exports = {
     proxyTable: {
         '/login': {
             target: 'http://localhost:8100',
-            changeOrigin: false
+            changeOrigin: true
+        },
+        '/Student': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
         }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

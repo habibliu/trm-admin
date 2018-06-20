@@ -5,8 +5,11 @@ function padding(s, len) {
     for (var i = 0; i < len; i++) { s = '0' + s; }
     return s;
 };
-
+function padLeftZero(str) {
+    return ('00' + str).substr(str.length);
+};
 export default {
+
     getQueryStringByName: function (name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
         var r = window.location.search.substr(1).match(reg);
@@ -16,14 +19,58 @@ export default {
         reg = null;
         r = null;
         return context == null || context == "" || context == "undefined" ? "" : context;
-    },
-    formatDate: {
+    }
+};
+/**
+ * 日期字符串解释成日期类型对象
+ * @param  {String} dateString 日期字符串
+ * @param  {String} pattern    日期字符串格式
+ * @return {Date}            日期对象
+ */
+export const parseDate=function (dateString, pattern) {
+  var matchs1 = pattern.match(SIGN_REGEXP);
+  var matchs2 = dateString.match(/(\d)+/g);
+  if (matchs1.length == matchs2.length) {
+    var _date = new Date(1970, 0, 1);
+    for (var i = 0; i < matchs1.length; i++) {
+      var _int = parseInt(matchs2[i]);
+      var sign = matchs1[i];
+      switch (sign.charAt(0)) {
+        case 'y': _date.setFullYear(_int); break;
+        case 'M': _date.setMonth(_int - 1); break;
+        case 'd': _date.setDate(_int); break;
+        case 'h': _date.setHours(_int); break;
+        case 'm': _date.setMinutes(_int); break;
+        case 's': _date.setSeconds(_int); break;
+      }
+    }
+    return _date;
+  }
+  return null;
+}
 
-
-        format: function (date, pattern) {
-            pattern = pattern || DEFAULT_PATTERN;
-            return pattern.replace(SIGN_REGEXP, function ($0) {
-                switch ($0.charAt(0)) {
+/**
+ * 格式化日期
+ * @param  {[type]} dateInput [description]
+ * @param  {[type]} pattern   [description]
+ * @return {[type]}           [description]
+ */
+export  const formatDate = function (dateInput, pattern) {
+  if(!dateInput){
+    return;
+  }
+  let date='';
+  if( typeof(dateInput)=='number'){
+    date=new Date(dateInput);
+  }else if( typeof(dateInput)=='date'){
+    date=dateInput;
+  }else{
+    return dateInput;
+  }
+  pattern = pattern || DEFAULT_PATTERN;
+  return pattern.replace(SIGN_REGEXP, function ($0) {
+    
+    switch ($0.charAt(0)) {
                     case 'y': return padding(date.getFullYear(), $0.length);
                     case 'M': return padding(date.getMonth() + 1, $0.length);
                     case 'd': return padding(date.getDate(), $0.length);
@@ -31,35 +78,20 @@ export default {
                     case 'h': return padding(date.getHours(), $0.length);
                     case 'm': return padding(date.getMinutes(), $0.length);
                     case 's': return padding(date.getSeconds(), $0.length);
-                }
-            });
-        },
-        parse: function (dateString, pattern) {
-            var matchs1 = pattern.match(SIGN_REGEXP);
-            var matchs2 = dateString.match(/(\d)+/g);
-            if (matchs1.length == matchs2.length) {
-                var _date = new Date(1970, 0, 1);
-                for (var i = 0; i < matchs1.length; i++) {
-                    var _int = parseInt(matchs2[i]);
-                    var sign = matchs1[i];
-                    switch (sign.charAt(0)) {
-                        case 'y': _date.setFullYear(_int); break;
-                        case 'M': _date.setMonth(_int - 1); break;
-                        case 'd': _date.setDate(_int); break;
-                        case 'h': _date.setHours(_int); break;
-                        case 'm': _date.setMinutes(_int); break;
-                        case 's': _date.setSeconds(_int); break;
-                    }
-                }
-                return _date;
-            }
-            return null;
-        }
-
     }
+  });
+}
 
-};
-
+export const calAge=function(birthDate){
+  if(!birthDate){
+    return;
+  }
+  if( typeof(birthDate)!='number'){
+    return;
+  }
+  var diff=new Date().getTime()-birthDate;
+  return Math.ceil(diff/1000/60/60/24/365);
+}
 // ajax错误处理
 export const catchError = function (error) {
   if (error.response) {

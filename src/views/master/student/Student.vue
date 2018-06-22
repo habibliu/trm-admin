@@ -82,8 +82,11 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentPhone">
-              <el-input v-model="editForm.telephone" placeholder="学员手机号码"></el-input>
+            <el-form-item label="学员编号" prop="code">
+              <el-input v-model="editForm.code" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="phone">
+              <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
               <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
@@ -118,11 +121,11 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentPhone">
-              <el-input v-model="editForm.parentPhone" placeholder="家长手机号码"></el-input>
-            </el-form-item>
             <el-form-item label="微信号">
               <el-input v-model="editForm.parentWx" placeholder="家长微信号码"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="parentPhone">
+              <el-input v-model="editForm.parentPhone" placeholder="家长手机号码"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -167,8 +170,11 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentPhone">
-              <el-input v-model="addForm.telephone" placeholder="学员手机号码"></el-input>
+            <el-form-item label="学员编号" prop="code">
+              <el-input v-model="addForm.code" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="phone">
+              <el-input v-model="addForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
               <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birthDate"></el-date-picker>
@@ -202,11 +208,11 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentPhone">
-              <el-input v-model="addForm.parentPhone" placeholder="家长手机号码"></el-input>
-            </el-form-item>
             <el-form-item label="微信号">
               <el-input v-model="addForm.parentWx" placeholder="家长微信号码"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="parentPhone">
+              <el-input v-model="addForm.parentPhone" placeholder="家长手机号码"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -274,6 +280,7 @@
         //编辑界面数据
         editForm: {
           id: 0,
+          code: '',
           name: '',
           sex: -1,
           age: 0,
@@ -301,6 +308,7 @@
         },
         //新增界面数据
         addForm: {
+          code:'',
           name: '',
           sex: -1,
           age: 0,
@@ -399,7 +407,9 @@
       handleAdd: function () {
         this.getSchools();
         this.addFormVisible = true;
-        this.$refs['addForm'].resetFields();
+        this.$nextTick(() => {
+          this.$refs['addForm'].resetFields();
+        });
       },
       //编辑
       editSubmit: function () {

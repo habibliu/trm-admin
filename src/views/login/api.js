@@ -3,7 +3,9 @@ import qs from 'qs';
 
 let base = '';
 
-export const requestLogin = params => { return Axios.post(`${base}/login`, qs.stringify(params)).then(res => res.data); };
+export const requestLogin = params => { 
+	return Axios.post(`${base}/login`, qs.stringify(params),{'headers':{'Content-Type':'application/x-www-form-urlencoded'}}).then(res => res.data); 
+};
 
 export const getUserList = params => { return Axios.get(`${base}/user/list`, { params: params }); };
 

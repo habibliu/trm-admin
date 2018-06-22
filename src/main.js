@@ -27,6 +27,7 @@ Vue.use(Vuex)
 Vue.use(ElementUI)
 Vue.component('full-calendar', fullCalendar)
 
+
 //NProgress.configure({ showSpinner: false });
 
 const router = new VueRouter({

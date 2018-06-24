@@ -4,7 +4,7 @@ import axios from '@/common/js/AxiosPlugin'
 let base = '';
 
 export const getStudentList = params => {
-	return axios.get(`${base}/Student/list`, { params: params });
+	return axios.get(`${base}/Student/list`, {params:{params:params}}).then(res => res.data);
 };
 
 export const getStudentListPage = params => {
@@ -17,12 +17,12 @@ export const batchRemoveStudent = params => { return axios.post(`${base}/Student
 
 export const editStudent = params => {
 	var par=JSON.stringify(params);
-	return axios.post(`${base}/Student/update`, par); 
+	return axios.post(`${base}/Student/update`, par).then(res => res.data);
 };
 
 export const addStudent = params => {
 	var par=JSON.stringify(params);
 	return axios.post(`${base}/Student/add`, par).then(res => res.data);
 };
-//取家长列表
-export const getSchoolList = params => { return axios.get(`${base}/Student/listSchools`, { params: params }); };
+//获取学校列表
+export const getSchoolList = params => { return axios.get(`${base}/Student/listSchools`, {params:{params:params}} };

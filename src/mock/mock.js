@@ -39,16 +39,15 @@ export default {
     });
   
     try{
-      //LoginMock(mock);
-      //EmployeeMock(mock);
+      //LoginMock(mock); //用户登录
+      EmployeeMock(mock); //员工档案
       OrganizationMock(mock);
       DepartmentMock(mock);
       UserMock(mock);
-      StudentMock(mock);
-      ParentMock(mock);
-      CoachMock(mock);
-      SportVenueMock(mock);
-      CourseMock(mock);
+      //StudentMock(mock);//学生档案
+      //CoachMock(mock);//教练档案
+      //SportVenueMock(mock);//体育场地档案
+      //CourseMock(mock); //课程档案
       CourseRegistrationMock(mock);
       CoursePaymentMock(mock);
       CourseScheduleMock(mock);

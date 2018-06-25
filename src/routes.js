@@ -18,7 +18,6 @@ import User from './views/pms/user/User.vue'
 import Role from './views/pms/role/Role.vue'
 
 import Student from './views/master/student/Student.vue'
-import Parent from './views/master/parent/Parent.vue'
 import Coach from './views/master/coach/Coach.vue'
 import SportVenue from './views/master/venue/SportVenue.vue'
 import Course from './views/master/course/Course.vue'

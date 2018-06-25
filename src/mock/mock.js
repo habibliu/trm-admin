@@ -7,7 +7,6 @@ import DepartmentMock from '@/views/orgmgt/department/mock/mock';
 import UserMock from '@/views/pms/user/mock/mock';
 //基础资料
 import  StudentMock from '@/views/master/student/mock/mock';
-import  ParentMock from '@/views/master/parent/mock/mock';
 import  CoachMock from '@/views/master/coach/mock/mock';
 import  SportVenueMock from '@/views/master/venue/mock/mock';
 import  CourseMock from '@/views/master/course/mock/mock';

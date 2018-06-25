@@ -6,6 +6,9 @@
         <el-form-item label="姓名">
           <el-input v-model="filters.name" placeholder="姓名"></el-input>
         </el-form-item>
+        <el-form-item label="编号">
+          <el-input v-model="filters.code" placeholder="编号"></el-input>
+        </el-form-item>
         <el-form-item label="性别">
           <el-select v-model="filters.sex" placeholder="请选择">
             <el-option label="全部" value=""></el-option>
@@ -14,7 +17,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="filters.telphone" placeholder="电话"></el-input>
+          <el-input v-model="filters.phone" placeholder="电话"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" v-on:click="getCoachs">查询</el-button>
@@ -33,13 +36,15 @@
       </el-table-column>
       <el-table-column prop="name" label="姓名" width="120" sortable>
       </el-table-column>
+      <el-table-column prop="code" label="编号" width="120" sortable>
+      </el-table-column>
       <el-table-column prop="sex" label="性别" width="80" :formatter="formatSex" sortable>
       </el-table-column>
-      <el-table-column prop="birth" label="生日" width="120" sortable>
+      <el-table-column prop="birthDate" label="生日" width="120" :formatter="formatBirthDate" sortable>
       </el-table-column>
-      <el-table-column prop="telphone" label="电话" width="140" sortable>
+      <el-table-column prop="phone" label="电话" width="140" sortable>
       </el-table-column>
-      <el-table-column prop="addr" label="地址" min-width="180" sortable>
+      <el-table-column prop="address" label="地址" min-width="180" sortable>
       </el-table-column>
       <el-table-column label="操作" width="150">
         <template scope="scope">
@@ -62,6 +67,9 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="editForm.name" auto-complete="off"></el-input>
         </el-form-item>
+        <el-form-item label="编号" prop="code">
+          <el-input v-model="editForm.code" auto-complete="off"></el-input>
+        </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="editForm.sex">
             <el-radio class="radio" :label="1">男</el-radio>
@@ -70,13 +78,13 @@
         </el-form-item>
        
         <el-form-item label="生日">
-          <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
         </el-form-item>
          <el-form-item label="电话">
-          <el-input v-model="editForm.telphone"></el-input>
+          <el-input v-model="editForm.phone"></el-input>
         </el-form-item>
         <el-form-item label="地址">
-          <el-input type="textarea" v-model="editForm.addr"></el-input>
+          <el-input type="textarea" v-model="editForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -91,6 +99,9 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
+        <el-form-item label="编号" prop="code">
+          <el-input v-model="addForm.code" auto-complete="off"></el-input>
+        </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="addForm.sex">
             <el-radio class="radio" :label="1">男</el-radio>
@@ -98,13 +109,13 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="生日">
-          <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birthDate"></el-date-picker>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="addForm.telphone" ></el-input>
+          <el-input v-model="addForm.phone" ></el-input>
         </el-form-item>
         <el-form-item label="地址">
-          <el-input type="textarea" v-model="addForm.addr"></el-input>
+          <el-input type="textarea" v-model="addForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,7 +127,7 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
+  import {formatDate} from '@/common/js/util'
   //import NProgress from 'nprogress'
   import { getCoachListPage, removeCoach, batchRemoveCoach, editCoach, addCoach } from './api';
 
@@ -124,9 +135,10 @@
     data() {
       return {
         filters: {
+          code: '',
           name: '',
           sex: '',
-          telphone: ''
+          phone: ''
         },
         coaches: [],
         total: 0,
@@ -144,11 +156,12 @@
         //编辑界面数据
         editForm: {
           id: 0,
+          code: '',
           name: '',
           sex: -1,
-          telphone: 0,
-          birth: '',
-          addr: '',
+          phone: 0,
+          birthDate: '',
+          address: '',
         },
 
         addFormVisible: false,//新增界面是否显示
@@ -160,11 +173,12 @@
         },
         //新增界面数据
         addForm: {
+          code: '',
           name: '',
           sex: -1,
-          telphone: 0,
-          birth: '',
-          addr: '',
+          phone: 0,
+          birthDate: '',
+          address: '',
         }
 
       }
@@ -173,6 +187,9 @@
       //性别显示转换
       formatSex: function (row, column) {
         return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
+      },
+      formatBirthDate: function(row,column){
+        return  formatDate(row.birthDate,"yyyy-MM-dd");
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -183,16 +200,15 @@
         let para = {
           page: this.page,
           name: this.filters.name,
+          code: this.filters.code,
           sex: this.filters.sex,
-          telphone: this.filters.telphone
+          phone: this.filters.phone
         };
         this.listLoading = true;
         getCoachListPage(para).then((res) => {
-          debugger;
           if( res && res.data){
             this.total = res.data.total;
-            this.coaches = res.data.coaches;
-          
+            this.coaches = res.data.rows;
           }
           this.listLoading = false;
         }).catch((error) => {
@@ -232,8 +248,8 @@
         this.addForm = {
           name: '',
           sex: -1,
-          telphone: 0,
-          birth: '',
+          phone: 0,
+          birthDate: '',
           addr: ''
         };
       },
@@ -245,7 +261,8 @@
               this.editLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              para.birthDate = (!para.birthDate || para.birthDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
+              debugger;
               editCoach(para).then((res) => {
                 this.editLoading = false;
                 //NProgress.done();
@@ -269,7 +286,7 @@
               this.addLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              para.birthDate = (!para.birthDate || para.birthDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
               addCoach(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();
@@ -298,7 +315,6 @@
           //NProgress.start();
           let para = { ids: ids };
           batchRemoveCoach(para).then((res) => {
-            
             //NProgress.done();
             this.$message({
               message: '删除成功',

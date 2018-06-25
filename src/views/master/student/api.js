@@ -25,4 +25,6 @@ export const addStudent = params => {
 	return axios.post(`${base}/Student/add`, par).then(res => res.data);
 };
 //获取学校列表
-export const getSchoolList = params => { return axios.get(`${base}/Student/listSchools`, {params:{params:params}} };
+export const getSchoolList = params => {
+	return axios.get(`${base}/Student/listSchools`, {params:{params:params}}).then(res => res.data);
+};

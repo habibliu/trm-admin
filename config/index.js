@@ -36,6 +36,18 @@ module.exports = {
         '/Student': {
             target: 'http://localhost:8100',
             changeOrigin: true
+        },
+        '/Coach': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Course': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Venue': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
         }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

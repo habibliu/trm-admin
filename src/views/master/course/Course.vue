@@ -7,7 +7,7 @@
           <el-input v-model="filters.name" placeholder="课程名称"></el-input>
         </el-form-item>
         <el-form-item label="级别">
-          <el-select v-model="filters.grade" placeholder="请选择">
+          <el-select v-model="filters.level" placeholder="请选择">
             <el-option label="全部" value=""></el-option>
             <el-option label="幼儿班" value="1"></el-option>
             <el-option label="基础班" value="2"></el-option>
@@ -42,15 +42,15 @@
       </el-table-column>
       <el-table-column prop="name" label="课程名称" width="140" sortable>
       </el-table-column>
-      <el-table-column prop="grade" label="级别" width="120" :formatter="formatGrade" sortable>
+      <el-table-column prop="level" label="级别" width="120" :formatter="formatLevel" sortable>
       </el-table-column>
       <el-table-column prop="phase" label="阶段" width="120" :formatter="formatPhase" sortable>
       </el-table-column>
       <el-table-column prop="ageSection" label="适合年龄段" width="140" :formatter="formatAgeSection" >
       </el-table-column>
-      <el-table-column prop="sections" label="每期节数" width="120" sortable>
+      <el-table-column prop="numberPerTerm" label="每期节数" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="price" label="每期定价" min-width="120" sortable>
+      <el-table-column prop="pricePerTerm" label="每期定价" min-width="120" sortable>
       </el-table-column>
       <el-table-column prop="memo" label="备注" min-width="180" sortable>
       </el-table-column>
@@ -76,7 +76,7 @@
           <el-input v-model="editForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="级别">
-          <el-select v-model="editForm.grade" placeholder="请选择">
+          <el-select v-model="editForm.level" placeholder="请选择">
             <el-option label="全部" value=""></el-option>
             <el-option label="幼儿班" value="1"></el-option>
             <el-option label="基础班" value="2"></el-option>
@@ -94,14 +94,14 @@
           </el-select>
         </el-form-item>
         <el-form-item label="适合年龄">
-          <el-input-number v-model="editForm.ageStart" size="small"></el-input-number>至
-          <el-input-number v-model="editForm.ageEnd" size="small"></el-input-number>
+          <el-input-number v-model="editForm.ageGradeStart" size="small"></el-input-number>至
+          <el-input-number v-model="editForm.ageGradeEnd" size="small"></el-input-number>岁
         </el-form-item>
         <el-form-item label="每期节数">
-          <el-input v-model="editForm.sections"></el-input>
+          <el-input v-model="editForm.numberPerTerm"></el-input>
         </el-form-item>
          <el-form-item label="每期定价">
-          <el-input v-model="editForm.price"></el-input>
+          <el-input v-model="editForm.pricePerTerm"></el-input>
         </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" v-model="editForm.memo" rows="4"></el-input>
@@ -120,7 +120,7 @@
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
          <el-form-item label="级别">
-          <el-select v-model="addForm.grade" placeholder="请选择">
+          <el-select v-model="addForm.level" placeholder="请选择">
             <el-option label="全部" value=""></el-option>
             <el-option label="幼儿班" value="1"></el-option>
             <el-option label="基础班" value="2"></el-option>
@@ -138,17 +138,17 @@
           </el-select>
         </el-form-item>
         <el-form-item label="适合年龄">
-          <el-input-number v-model="addForm.ageStart" size="small"></el-input-number>至
-          <el-input-number v-model="addForm.ageEnd" size="small"></el-input-number>
+          <el-input-number v-model="addForm.ageGradeStart" size="small"></el-input-number>至
+          <el-input-number v-model="addForm.ageGradeEnd" size="small"></el-input-number>岁
         </el-form-item>
         <el-form-item label="每期节数">
-          <el-input   v-model="editForm.sections"></el-input>
+          <el-input   v-model="addForm.numberPerTerm"></el-input>
         </el-form-item>
          <el-form-item label="每期定价">
-          <el-input v-model="editForm.price"></el-input>
+          <el-input v-model="addForm.pricePerTerm"></el-input>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" v-model="editForm.memo" rows="4"></el-input>
+          <el-input type="textarea" v-model="addForm.memo" rows="4"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -160,7 +160,6 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
   //import NProgress from 'nprogress'
   import { getCourseListPage, removeCourse, batchRemoveCourse, editCourse, addCourse } from './api';
 
@@ -169,7 +168,7 @@
       return {
         filters: {
           name: '',
-          grade: '',
+          level: '',
           phase: ''
         },
         courses: [],
@@ -177,7 +176,8 @@
         page: 1,
         listLoading: false,
         sels: [],//列表选中列
-
+        levels:[{id:'1',label:'幼儿班'},{id:'2',label:'基础班'},{id:'3',label:'提高班'},{id:'4',label:'精英班'}],
+        phases:[{id:'1',label:'第一阶段'},{id:'2',label:'第二阶段'},{id:'3',label:'第三阶段'},{id:'4',label:'第四阶段'}],
         editFormVisible: false,//编辑界面是否显示
         editLoading: false,
         editFormRules: {
@@ -187,14 +187,14 @@
         },
         //编辑界面数据
         editForm: {
-          id: 0,
+          id: '',
           name: '',
-          grade: 0,
-          phase: 0,
-          sections: '',
-          price: '',
-          ageStart: '',
-          ageEnd: '',
+          level: '',
+          phase: '',
+          numberPerTerm: '',
+          pricePerTerm: '',
+          ageGradeStart: '',
+          ageGradeEnd: '',
           memo: '',
         },
 
@@ -208,12 +208,12 @@
         //新增界面数据
         addForm: {
           name: '',
-          grade: 0,
-          phase: 0,
-          sections: '',
-          price: '',
-          ageStart: '',
-          ageEnd: '',
+          level: '',
+          phase: '',
+          numberPerTerm: '',
+          pricePerTerm: '',
+          ageGradeStart: '',
+          ageGradeEnd: '',
           memo: '',
         }
 
@@ -221,14 +221,24 @@
     },
     methods: {
       //级别显示转换
-      formatGrade: function (row, column) {
-        return row.grade['name'];
+      formatLevel: function (row, column) {
+        for(var i=0;i<4;i++){
+          if(this.levels[i].id==row.level){
+            return this.levels[i].label;
+          }
+        }
+        return row.level;
       },
       formatPhase: function (row, column){
-        return row.phase['name'];
+        for(var i=0;i<4;i++){
+          if(this.phases[i].id==row.phase){
+            return this.phases[i].label;
+          }
+        }
+        return row.phase;
       },
       formatAgeSection: function (row, column){
-        return row.grade['ageStart']+' - ' + row.grade['ageEnd'];
+        return row['ageGradeStart']+' - ' + row['ageGradeEnd'];
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -246,8 +256,7 @@
         getCourseListPage(para).then((res) => {
           if( res && res.data){
             this.total = res.data.total;
-            this.courses = res.data.courses;
-          
+            this.courses = res.data.rows;
           }
           this.listLoading = false;
         }).catch((error) => {
@@ -280,18 +289,23 @@
       handleEdit: function (index, row) {
         this.editFormVisible = true;
         this.editForm = Object.assign({}, row);
-        this.editForm.ageStart=row.grade.ageStart;
-        this.editForm.ageEnd=row.grade.ageEnd;
+        debugger;
+        //this.editForm.ageGradeStart=row.level.ageGradeStart;
+        //this.editForm.ageGradeEnd=row.level.ageGradeEnd;
       },
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
+          id:'',
           name: '',
-          sex: -1,
-          telphone: 0,
-          birth: '',
-          addr: ''
+          level: 0,
+          phase: 0,
+          numberPerTerm: '',
+          pricePerTerm: '',
+          ageGradeStart: '',
+          ageGradeEnd: '',
+          memo: '',
         };
       },
       //编辑
@@ -302,7 +316,6 @@
               this.editLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
               editCourse(para).then((res) => {
                 this.editLoading = false;
                 //NProgress.done();
@@ -326,7 +339,6 @@
               this.addLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
               addCourse(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();

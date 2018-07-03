@@ -47,7 +47,7 @@ export default {
       //CoachMock(mock);//教练档案
       //SportVenueMock(mock);//体育场地档案
       //CourseMock(mock); //课程档案
-      CourseRegistrationMock(mock);
+      //CourseRegistrationMock(mock);
       CoursePaymentMock(mock);
       CourseScheduleMock(mock);
       AttendanceMock(mock);

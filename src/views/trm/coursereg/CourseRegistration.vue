@@ -4,10 +4,10 @@
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
       <el-form :inline="true" :model="filters">
         <el-form-item label="课程名称">
-          <el-input v-model="filters.name" placeholder="课程名称"></el-input>
+          <el-input v-model="filters.studentName" placeholder="课程名称"></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="filters.telphone" placeholder="电话"></el-input>
+          <el-input v-model="filters.phone" placeholder="电话"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" v-on:click="getRegistrations">查询</el-button>
@@ -24,15 +24,19 @@
       </el-table-column>
       <el-table-column type="index" width="60">
       </el-table-column>
+       <el-table-column prop="studentCode" label="学员编号" width="120" sortable>
+      </el-table-column>
       <el-table-column prop="studentName" label="学员姓名" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="studentSex" label="性别" width="100" :formatter="formatSex" sortable>
+      <el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
       </el-table-column>
-      <el-table-column prop="studentAge" label="年龄" width="100" sortable>
+      <el-table-column prop="birthDate" label="生日" width="100" sortable>
       </el-table-column>
-      <el-table-column prop="studentSchool" label="在读学校" width="180" sortable>
+      <el-table-column prop="age" label="年龄" width="100" sortable>
       </el-table-column>
-      <el-table-column prop="studentTelephone" label="学员电话" width="140" sortable>
+      <el-table-column prop="school" label="在读学校" width="180" sortable>
+      </el-table-column>
+      <el-table-column prop="phone" label="学员电话" width="140" sortable>
       </el-table-column>
       <el-table-column prop="registerDate" label="报名日期" width="120" sortable>
       </el-table-column>
@@ -215,8 +219,8 @@
     data() {
       return {
         filters: {//过滤条件
-          courseName: '',
-          schoolName: ''
+          studentName: '',
+          phone: ''
         },
         registrations: [],
         courses: [],
@@ -278,17 +282,16 @@
       },
       //获取学员注册列表
       getRegistrations() {
-        let para = {
-          page: this.page,
-          name: this.filters.name,
-          sex: this.filters.sex,
-          telphone: this.filters.telphone
+        let para = {         
+          studentName: this.filters.studentName,
+          phone: this.filters.phone
         };
+        let page={ 'currentPage': this.page,'pageSize':10};
         this.listLoading = true;
-        getRegistrationListPage(para).then((res) => {
+        getRegistrationListPage(para,page).then((res) => {
           if( res && res.data){
             this.total = res.data.total;
-            this.registrations = res.data.registrations;
+            this.registrations = res.data.rows;
           
           }
           this.listLoading = false;

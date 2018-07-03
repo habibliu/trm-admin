@@ -48,6 +48,10 @@ module.exports = {
         '/Venue': {
             target: 'http://localhost:8100',
             changeOrigin: true
+        },
+        '/Registion': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
         }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

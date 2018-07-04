@@ -91,8 +91,8 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentTelephone">
-              <el-input v-model="editForm.telephone" placeholder="学员手机号码"></el-input>
+            <el-form-item label="手机号" prop="phone">
+              <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
               <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
@@ -127,8 +127,8 @@
                 <el-radio class="radio" :label="0">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="parentTelephone">
-              <el-input v-model="editForm.parentTelephone" placeholder="家长手机号码"></el-input>
+            <el-form-item label="手机号" prop="parentPhone">
+              <el-input v-model="editForm.parentPhone" placeholder="家长手机号码"></el-input>
             </el-form-item>
             <el-form-item label="微信号">
               <el-input v-model="editForm.parentWx" placeholder="家长微信号码"></el-input>
@@ -177,7 +177,7 @@
             </el-form-item>
             <el-form-item label="赠送节数">
               <template slot-scope="scope">
-                <el-input-number v-model="editForm.git"   size="small"></el-input-number>
+                <el-input-number v-model="editForm.attachSections"   size="small"></el-input-number>
                 <el-checkbox v-model="checked">自动</el-checkbox>
               </template>
             </el-form-item>
@@ -241,14 +241,14 @@
         editForm: {
           id: 0,
           name: '',
-          telphone: 0,
+          phone: 0,
           birth: '',
           sex: '',
-          telphone:'',
+          phone:'',
           age:0,
           school: '',
           parentName: '',
-          parentTelephone: '',
+          parentPhone: '',
           parentWX: '',
           course:'',
           grade:'',
@@ -258,6 +258,7 @@
           periods: 0,
           totalFee: 0,
           totalSections:0,
+          attachSections:0,
         }
 
       }
@@ -282,7 +283,7 @@
       },
       //获取学员注册列表
       getRegistrations() {
-        let para = {         
+        let para = {
           studentName: this.filters.studentName,
           phone: this.filters.phone
         };
@@ -292,7 +293,6 @@
           if( res && res.data){
             this.total = res.data.total;
             this.registrations = res.data.rows;
-          
           }
           this.listLoading = false;
         }).catch((error) => {
@@ -317,11 +317,11 @@
       },
       getCourses(){//获取课程列表
         let para = {
-          name: '2018',
+          name: '',
         };
         getCourseList(para).then((res) => {
           if( res && res.data){
-            this.courses = res.data.courses;
+            this.courses = res.data;
           }
         }).catch((error) => {
           console.log(error);
@@ -329,21 +329,14 @@
       },
       setCourseDetail(){
         debugger;
-        var courseId=this.editForm.course;
-        let para = {
-          id: courseId
-        };
-        getCourseDetail(para).then((res) =>{
-          if( res && res.data){
-
-            this.editForm.grade = res.data.course.grade;
-            this.editForm.phase = res.data.course.phase;
-            this.editForm.price = res.data.course.price;
-            this.editForm.sections = res.data.course.sections;
+        for(var i = 0,len=this.courses.length; i < len; i++) {
+          if(this.courses[i].id==this.editForm.course){
+            this.editForm.grade = this.courses[i].level;
+            this.editForm.phase = this.courses[i].phase;
+            this.editForm.price = this.courses[i].pricePerTerm;
+            this.editForm.sections =this.courses[i].numberPerTerm;
           }
-        }).catch((error) => {
-          console.log(error);
-        });
+        }
       },
       //删除
       handleDel: function (index, row) {
@@ -375,9 +368,9 @@
           age: '',
           height: '',
           school: '',
-          telphone: '',
+          phone: '',
           parentName: '',
-          parentTelephone: '',
+          parentPhone: '',
         };
       },
       //显示编辑界面

@@ -5,7 +5,6 @@ let base = '';
 
 
 export const getRegistrationListPage = (params ,page)=> { 
-	debugger;
   return axios.get(`${base}/Registion/listPage`, {params:{'params':params,'page':page}}).then(res => res.data); 
 };
 
@@ -23,8 +22,9 @@ export const addRegistration = params => {
 	return axios.post(`${base}/Registion/add`, par).then(res => res.data); 
 };
 //获取课程列表
-export const getCourseList = params => { 
-	return axios.get(`${base}/Registion/Course/list`, {params:{params:params}}).then(res => res.data); 
+export const getCourseList = params => {
+	debugger;
+	return axios.get(`${base}/Course/list`, {params:{params:params}}).then(res => res.data); 
 };
 //获取课程详细信息
 export const getCourseDetail = params => { 

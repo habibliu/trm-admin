@@ -19,11 +19,11 @@ export const editRegistration = params => {
 
 export const addRegistration = params => { 
 	var par=JSON.stringify(params);
+	debugger;
 	return axios.post(`${base}/Registion/add`, par).then(res => res.data); 
 };
 //获取课程列表
 export const getCourseList = params => {
-	debugger;
 	return axios.get(`${base}/Course/list`, {params:{params:params}}).then(res => res.data); 
 };
 //获取课程详细信息

@@ -30,7 +30,7 @@
       </el-table-column>
       <el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
       </el-table-column>
-      <el-table-column prop="birthDate" label="生日" width="100" sortable>
+      <el-table-column prop="birthDateDate" label="生日" width="100" sortable>
       </el-table-column>
       <el-table-column prop="age" label="年龄" width="100" sortable>
       </el-table-column>
@@ -95,7 +95,7 @@
               <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
               <el-input-number v-model="editForm.age" :disabled=true></el-input-number>
@@ -112,7 +112,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id">
-                </el-option>
+               </el-option>
               </el-select>
             </el-form-item>
             
@@ -203,7 +203,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="editFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+        <el-button type="primary" @click.native="handleSubmit" :loading="editLoading">提交</el-button>
       </div>
     </el-dialog>
     
@@ -211,7 +211,7 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
+  import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
   import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getCourseDetail, getSchoolList } from './api';
 
@@ -242,7 +242,7 @@
           id: 0,
           name: '',
           phone: 0,
-          birth: '',
+          birthDate: '',
           sex: '',
           phone:'',
           age:0,
@@ -328,7 +328,6 @@
         });
       },
       setCourseDetail(){
-        debugger;
         for(var i = 0,len=this.courses.length; i < len; i++) {
           if(this.courses[i].id==this.editForm.course){
             this.editForm.grade = this.courses[i].level;
@@ -364,7 +363,7 @@
           id:'',
           name:'',
           sex: '',
-          birth: '',
+          birthDate: '',
           age: '',
           height: '',
           school: '',
@@ -399,7 +398,7 @@
               this.editLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              para.birthDate = (!para.birthDate || para.birthDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
               editRegistration(para).then((res) => {
                 this.editLoading = false;
                 //NProgress.done();
@@ -416,14 +415,15 @@
         });
       },
       //新增
-      addSubmit: function () {
-        this.$refs.addForm.validate((valid) => {
+      handleSubmit: function () {
+        this.$refs.editForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
               //NProgress.start();
-              let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              debugger;
+              let para = Object.assign({}, this.editForm);
+              para.birthDateDate = (!para.birthDateDate || para.birthDateDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
               addRegistration(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();
@@ -431,8 +431,8 @@
                   message: '提交成功',
                   type: 'success'
                 });
-                this.$refs['addForm'].resetFields();
-                this.addFormVisible = false;
+                this.$refs['editForm'].resetFields();
+                this.editFormVisible = false;
                 this.getRegistrations();
               });
             });

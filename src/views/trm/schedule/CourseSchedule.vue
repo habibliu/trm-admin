@@ -4,8 +4,8 @@
     <el-row :gutter="20">
       <el-col :span="7"><div class="grid-content bg-purple" style="padding-top:20px;"></div>
         <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" >
-          <el-form-item label="课程名称" prop="course">
-            <el-select v-model="addForm.course" filterable placeholder="请选择" @change="getStudents">
+          <el-form-item label="课程名称" prop="courseId">
+            <el-select v-model="addForm.courseId" filterable placeholder="请选择" @change="getStudents"  size="mini">
               <el-option
                 :remote-method="getCourses"
                 v-for="item in courses"
@@ -17,7 +17,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="教练" prop="coach">
-            <el-select v-model="addForm.coach" filterable placeholder="请选择">
+            <el-select v-model="addForm.coach" filterable placeholder="请选择"  size="mini">
               <el-option
                 :remote-method="getCoaches"
                 v-for="item in coaches"
@@ -28,7 +28,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="场地" prop="venue">
-            <el-select v-model="addForm.venue" filterable placeholder="请选择">
+            <el-select v-model="addForm.venue" filterable placeholder="请选择"  size="mini">
               <el-option
                 :remote-method="getVenues"
                 v-for="item in venues"
@@ -39,7 +39,21 @@
             </el-select>
           </el-form-item>
           <el-form-item label="教学日期" prop="date">
-            <el-date-picker type="dates" placeholder="选择一个或多个日期" v-model="addForm.dates"></el-date-picker>
+            <el-date-picker type="dates" placeholder="选择一个或多个日期" v-model="addForm.dates"  size="mini"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="教学时间">
+            <el-time-picker
+              is-range
+              size="mini"
+              clear-icon
+              value-format="HH:mm"
+              v-model="addForm.timeSpan"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              placeholder="选择时间范围"
+              style="width:200px;">
+            </el-time-picker>
           </el-form-item>
         </el-form>
         <el-table :data="students" highlight-current-row v-loading="listLoading" @selection-change="selsChange" ref="studentTable">
@@ -60,10 +74,10 @@
       <el-col :span="1"><div class="grid-content bg-purple"></div>
         <div class="button-container">
           <div class="arrange-button">
-            <el-button type="primary"  @click="appendSchedule" >排期>></el-button>
+            <el-button type="primary"  @click="appendSchedule"  size="mini">>></el-button>
           </div>
           <div class="arrange-button">
-            <el-button type="primary" @click="removeSchedule"><<取消</el-button>
+            <el-button type="primary" @click="removeSchedule"  size="mini"><<</el-button>
           </div>
         </div>
       </el-col>
@@ -144,7 +158,7 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
+  import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
   import { getCourseList, getCoachList, getVenueList,getCourseStudents } from './api';
 
@@ -164,7 +178,7 @@
         addFormVisible: true,//新增界面是否显示
         addLoading: false,
         addFormRules: {
-          course: [
+          courseId: [
             { required: true, message: '请选择课程名称', trigger: 'blur' }
           ],
           coach: [
@@ -177,10 +191,11 @@
         },
         //新增界面数据
         addForm: {
-          course: '',
+          courseId: '',
           coach: '',
           venue: '',
           dates: [],
+          timeSpan:'',
         },
         detailFormVisible: false,
         detailForm:{
@@ -200,11 +215,12 @@
       },
       getCourses(){//获取课程列表
         let para = {
-          name: '2018',
+          name: '',
         };
         getCourseList(para).then((res) => {
+          debugger;
           if( res && res.data){
-            this.courses = res.data.courses;
+            this.courses = res.data;
           }
         }).catch((error) => {
           console.log(error);
@@ -215,7 +231,7 @@
         };
         getCoachList(para).then((res) => {
           if( res && res.data){
-            this.coaches = res.data.coaches;
+            this.coaches = res.data;
           }
         }).catch((error) => {
           console.log(error);
@@ -226,7 +242,7 @@
         };
         getVenueList(para).then((res) => {
           if( res && res.data){
-            this.venues = res.data.venues;
+            this.venues = res.data;
           }
         }).catch((error) => {
           console.log(error);
@@ -234,12 +250,12 @@
       },
       getStudents(){//获取课程报名学员列表
         let para = {
-          course:this.addForm.course
+          courseId:this.addForm.courseId
         };
 
         getCourseStudents(para).then((res) => {
           if( res && res.data){
-            this.students = res.data.students;
+            this.students = res.data;
             setTimeout(() => {
               this.students.forEach(item => {
                 this.$refs.studentTable.toggleRowSelection(item,true);
@@ -253,15 +269,15 @@
       appendSchedule(){//追加排班
         for(let i=0;i<this.addForm.dates.length;i++){
           let event={
-            title:this.getCouserName(this.addForm.course),
+            title:this.getCouserName(this.addForm.courseId),
             start:this.addForm.dates[i],
             end:this.addForm.dates[i],
             cssClass : ['home', 'work']
           };
           let DATA ={
-            courseId:this.addForm.course,
-            courseName:this.getCouserName(this.addForm.course),
-            date : util.formatDate.format(this.addForm.dates[i],'yyyy-MM-dd'),
+            courseId:this.addForm.courseId,
+            courseName:this.getCouserName(this.addForm.courseId),
+            date : formatDate(this.addForm.dates[i],'yyyy-MM-dd'),
             venueId: this.addForm.venue,
             venueName: this.getVenueName(this.addForm.venue),
             coachId: this.addForm.coach,
@@ -276,12 +292,12 @@
       },
       removeSchedule(){//移除排班
         for(let i=0;i<this.addForm.dates.length;i++){
-          var deletingDate=util.formatDate.format(this.addForm.dates[i],'yyyy-MM-dd');
+          var deletingDate=formatDate(this.addForm.dates[i],'yyyy-MM-dd');
           for(let j=0;j<this.calendarOptions.events.length;j++){
             var event=this.calendarOptions.events[j];
-            var currentDate=util.formatDate.format(event.start,'yyyy-MM-dd');
+            var currentDate=formatDate(event.start,'yyyy-MM-dd');
             if(currentDate==deletingDate){
-              if (event.DATA.courseId==this.addForm.course){
+              if (event.DATA.courseId==this.addForm.courseId){
                 debugger;
                 var event=this.calendarOptions.events.splice(j,1);
                 this.changeStudentSections(event.DATA.students,false);
@@ -354,7 +370,6 @@
               this.addLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
               addSchedule(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();

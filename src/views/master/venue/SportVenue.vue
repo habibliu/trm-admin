@@ -7,7 +7,7 @@
           <el-input v-model="filters.name" placeholder="场地名称"></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="filters.telphone" placeholder="电话"></el-input>
+          <el-input v-model="filters.phone" placeholder="电话"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" v-on:click="getVenues">查询</el-button>
@@ -26,11 +26,11 @@
       </el-table-column>
       <el-table-column prop="name" label="场地名称" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="birth" label="租赁日期" width="120" sortable>
+      <el-table-column prop="expireDate" label="租赁日期" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="telphone" label="电话" width="140" sortable>
+      <el-table-column prop="phone" label="电话" width="140" sortable>
       </el-table-column>
-      <el-table-column prop="addr" label="地址" min-width="180" sortable>
+      <el-table-column prop="address" label="地址" min-width="180" sortable>
       </el-table-column>
       <el-table-column label="操作" width="150">
         <template scope="scope">
@@ -54,13 +54,13 @@
           <el-input v-model="editForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="租赁日期">
-          <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期" v-model="editForm.expireDate"></el-date-picker>
         </el-form-item>
          <el-form-item label="电话">
-          <el-input v-model="editForm.telphone"></el-input>
+          <el-input v-model="editForm.phone"></el-input>
         </el-form-item>
         <el-form-item label="地址">
-          <el-input type="textarea" v-model="editForm.addr"></el-input>
+          <el-input type="textarea" v-model="editForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -72,17 +72,20 @@
     <!--新增界面-->
     <el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-        <el-form-item label="姓名" prop="name">
+        <el-form-item label="场地名称" prop="name">
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="租赁日期">
-          <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期" v-model="addForm.expireDate"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="负责人" prop="principal">
+          <el-input v-model="addForm.principal" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="addForm.telphone" ></el-input>
+          <el-input v-model="addForm.phone" ></el-input>
         </el-form-item>
         <el-form-item label="地址">
-          <el-input type="textarea" v-model="addForm.addr"></el-input>
+          <el-input type="textarea" v-model="addForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -94,7 +97,7 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
+  import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
   import { getVenueListPage, removeVenue, batchRemoveVenue, editVenue, addVenue } from './api';
 
@@ -103,7 +106,7 @@
       return {
         filters: {//过滤条件
           name: '',
-          telphone: ''
+          phone: ''
         },
         venues: [],
         total: 0,
@@ -122,9 +125,10 @@
         editForm: {
           id: 0,
           name: '',
-          telphone: 0,
-          birth: '',
-          addr: '',
+          phone: 0,
+          expireDate: '',
+          address: '',
+          principal: '',
         },
 
         addFormVisible: false,//新增界面是否显示
@@ -137,18 +141,15 @@
         //新增界面数据
         addForm: {
           name: '',
-          telphone: 0,
-          birth: '',
-          addr: '',
+          phone: 0,
+          expireDate: '',
+          address: '',
+          principal: '',
         }
 
       }
     },
     methods: {
-      //性别显示转换
-      formatSex: function (row, column) {
-        return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
-      },
       handleCurrentChange(val) {
         this.page = val;
         this.getVenues();
@@ -158,8 +159,7 @@
         let para = {
           page: this.page,
           name: this.filters.name,
-          sex: this.filters.sex,
-          telphone: this.filters.telphone
+          phone: this.filters.phone
         };
         this.listLoading = true;
         getVenueListPage(para).then((res) => {
@@ -206,10 +206,10 @@
         this.addFormVisible = true;
         this.addForm = {
           name: '',
-          sex: -1,
-          telphone: 0,
-          birth: '',
-          addr: ''
+          phone: 0,
+          expireDate: '',
+          address: '',
+          principal: ''
         };
       },
       //编辑
@@ -220,7 +220,7 @@
               this.editLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              para.expireDate = (!para.expireDate || para.expireDate == '') ? '' : formatDate(new Date(para.expireDate), 'yyyy-MM-dd');
               editVenue(para).then((res) => {
                 this.editLoading = false;
                 //NProgress.done();
@@ -244,7 +244,7 @@
               this.addLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+              para.expireDate = (!para.expireDate || para.expireDate == '') ? '' : formatDate(new Date(para.expireDate), 'yyyy-MM-dd');
               addVenue(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();

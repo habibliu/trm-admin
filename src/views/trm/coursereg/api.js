@@ -26,9 +26,9 @@ export const addRegistration = params => {
 export const getCourseList = params => {
 	return axios.get(`${base}/Course/list`, {params:{params:params}}).then(res => res.data); 
 };
-//获取课程详细信息
-export const getCourseDetail = params => { 
-	return axios.get(`${base}/Registion/Course/get`, {params:{params:params}}).then(res => res.data); 
+//获取数据字典
+export const getDictionaryList = params => { 
+	return axios.get(`${base}/Dictionary/list`, {params:{params:params}}).then(res => res.data); 
 };
 
 //获取学校列表

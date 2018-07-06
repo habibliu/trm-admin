@@ -82,8 +82,11 @@
       <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
         <el-row :gutter="20">
           <el-col :span="6"><div class="grid-content bg-purple"></div>
-            <el-form-item label="学员姓名" prop="name">
-              <el-input v-model="editForm.name" auto-complete="off"></el-input>
+            <el-form-item label="学员编号" prop="studentCode">
+              <el-input v-model="editForm.studentCode" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="学员姓名" prop="studentName">
+              <el-input v-model="editForm.studentName" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="性别">
               <el-radio-group v-model="editForm.sex">
@@ -118,6 +121,9 @@
             
           </el-col>
           <el-col :span="6"><div class="grid-content bg-purple"></div>
+             <el-form-item label="注册日期">
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.registerDate"></el-date-picker>
+            </el-form-item>
             <el-form-item label="家长姓名" prop="parentName">
               <el-input v-model="editForm.parentName" filterable placeholder="请输入家姓名" ></el-input>
             </el-form-item>
@@ -135,8 +141,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="6"><div class="grid-content bg-purple"></div>
-            <el-form-item label="课程名称" prop="course">
-            <el-select v-model="editForm.course" filterable placeholder="请选择" @change="setCourseDetail">
+            <el-form-item label="课程名称" prop="courseId">
+            <el-select v-model="editForm.courseId" filterable placeholder="请选择" @change="setCourseDetail">
               <el-option
                 :remote-method="getCourses"
                 v-for="item in courses"
@@ -149,11 +155,14 @@
             </el-form-item>
             <el-form-item label="级别">
               <el-select v-model="editForm.grade" placeholder="请选择" :disabled=true>
-                <el-option label="全部" value=""></el-option>
-                <el-option label="幼儿班" value="1"></el-option>
-                <el-option label="基础班" value="2"></el-option>
-                <el-option label="提高班" value="3"></el-option>
-                <el-option label="精英班" value="4"></el-option>
+                 <el-option
+                :remote-method="getCoursesGrade"
+                v-for="item in courseGrades"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+                >
+              </el-option>
               </el-select>
             </el-form-item>
            <el-form-item label="阶段">
@@ -213,7 +222,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getCourseDetail, getSchoolList } from './api';
+  import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getDictionaryList, getSchoolList } from './api';
 
   export default {
     data() {
@@ -224,6 +233,8 @@
         },
         registrations: [],
         courses: [],
+        courseGrades: [],//课程等级
+        coursePhases: [],//课程阶段
         schools:[],
         total: 0,
         page: 1,
@@ -240,7 +251,8 @@
         //编辑界面数据
         editForm: {
           id: 0,
-          name: '',
+          studentCode:'',
+          studentName: '',
           phone: 0,
           birthDate: '',
           sex: '',
@@ -250,7 +262,7 @@
           parentName: '',
           parentPhone: '',
           parentWX: '',
-          course:'',
+          courseId:'',
           grade:'',
           phase:'',
           price:'',
@@ -290,6 +302,7 @@
         let page={ 'currentPage': this.page,'pageSize':10};
         this.listLoading = true;
         getRegistrationListPage(para,page).then((res) => {
+          debugger;
           if( res && res.data){
             this.total = res.data.total;
             this.registrations = res.data.rows;
@@ -329,13 +342,37 @@
       },
       setCourseDetail(){
         for(var i = 0,len=this.courses.length; i < len; i++) {
-          if(this.courses[i].id==this.editForm.course){
+          if(this.courses[i].id==this.editForm.courseId){
             this.editForm.grade = this.courses[i].level;
             this.editForm.phase = this.courses[i].phase;
             this.editForm.price = this.courses[i].pricePerTerm;
             this.editForm.sections =this.courses[i].numberPerTerm;
           }
         }
+      },
+      getCoursesGrade(){
+        let para = {
+          typeCode: 'COURSE-GRADE',
+        };
+        getDictionaryList(para).then((res) => {
+          if( res && res.data){
+            this.courseGrades = res.data;
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+      },
+      getCoursesPhases(){
+        let para = {
+          typeCode: 'COURSE-PHASE',
+        };
+        getDictionaryList(para).then((res) => {
+          if( res && res.data){
+            this.coursePhases = res.data;
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
       },
       //删除
       handleDel: function (index, row) {
@@ -360,16 +397,26 @@
       },
       clearFormData() {
         this.editForm = {
-          id:'',
-          name:'',
-          sex: '',
+          id: 0,
+          name: '',
+          phone: 0,
           birthDate: '',
-          age: '',
-          height: '',
+          sex: '',
+          phone:'',
+          age:0,
           school: '',
-          phone: '',
           parentName: '',
           parentPhone: '',
+          parentWX: '',
+          courseId:'',
+          grade:'',
+          phase:'',
+          price:'',
+          sections:'',
+          periods: 0,
+          totalFee: 0,
+          totalSections:0,
+          attachSections:0
         };
       },
       //显示编辑界面

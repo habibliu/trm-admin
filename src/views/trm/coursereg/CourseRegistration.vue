@@ -113,8 +113,8 @@
                   :loading="loading"
                   v-for="item in schools"
                   :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
+                  :label="item.itemName"
+                  :value="item.itemCode">
                </el-option>
               </el-select>
             </el-form-item>
@@ -155,23 +155,26 @@
             </el-form-item>
             <el-form-item label="级别">
               <el-select v-model="editForm.grade" placeholder="请选择" :disabled=true>
-                 <el-option
-                :remote-method="getCoursesGrade"
+                <el-option
+                :remote-method="getCourseGrades"
                 v-for="item in courseGrades"
                 :key="item.id"
-                :label="item.name"
-                :value="item.id"
+                :label="item.itemName"
+                :value="item.itemCode"
                 >
               </el-option>
               </el-select>
             </el-form-item>
            <el-form-item label="阶段">
               <el-select v-model="editForm.phase" placeholder="请选择" :disabled=true>
-                <el-option label="全部" value=""></el-option>
-                <el-option label="第一阶段" value="1"></el-option>
-                <el-option label="第二阶段" value="2"></el-option>
-                <el-option label="第三阶段" value="3"></el-option>
-                <el-option label="第四阶段" value="4"></el-option>
+                <el-option
+                :remote-method="getCoursesPhases"
+                v-for="item in coursePhases"
+                :key="item.id"
+                :label="item.itemName"
+                :value="item.itemCode"
+                >
+                </el-option>
               </el-select>
             </el-form-item>
            
@@ -182,11 +185,13 @@
               <el-input v-model="editForm.sections" :disabled=true></el-input>
             </el-form-item>
             <el-form-item label="报名期数" >
-              <el-input-number v-model="editForm.periods" :min=1 size="small"></el-input-number>
+              <el-input-number v-model="editForm.periods" :min=1 size="small" @change="periodsChange"></el-input-number>
             </el-form-item>
             <el-form-item label="赠送节数">
               <template slot-scope="scope">
-                <el-input-number v-model="editForm.attachSections"   size="small"></el-input-number>
+                <el-input-number v-model="editForm.attachSections"   size="small"
+                @change="attachSectionsChange">
+                </el-input-number>
                 <el-checkbox v-model="checked">自动</el-checkbox>
               </template>
             </el-form-item>
@@ -284,14 +289,23 @@
         return row.payoff == 1 ? '已付' : row.payoff == 0 ? '未付' : '未付';
       },
       formatGrade: function (row, column) {
-        return row.courseGrade['name'];
+        //return this.courseGrades[row.level].itemName;
+        return row.level
       },
       formatPhase: function (row, column){
-        return row.coursePhase['name'];
+        //return row.coursePhase[row.phase].itemName;
+        return row.phase
       },
       handleCurrentChange(val) {
         this.page = val;
         this.getRegistrations();
+      },
+      periodsChange:function(value){
+        this.editForm.totalFee=this.editForm.price * value;
+        this.editForm.totalSections =  this.editForm.sections * value + this.editForm.attachSections;
+      },
+      attachSectionsChange:function(value){
+        this.editForm.totalSections =  this.editForm.sections * this.editForm.periods + value;
       },
       //获取学员注册列表
       getRegistrations() {
@@ -302,7 +316,6 @@
         let page={ 'currentPage': this.page,'pageSize':10};
         this.listLoading = true;
         getRegistrationListPage(para,page).then((res) => {
-          debugger;
           if( res && res.data){
             this.total = res.data.total;
             this.registrations = res.data.rows;
@@ -315,12 +328,12 @@
       },
       getSchools() {//获取学校列表
         let para = {
-          name: this.editForm.school,
+          //name: this.editForm.school,
         };
         this.loading  = true;
         getSchoolList(para).then((res) => {
           if( res && res.data){
-            this.schools = res.data.schools;
+            this.schools = res.data;
           }
           this.loading  = false;
         }).catch((error) => {
@@ -347,6 +360,8 @@
             this.editForm.phase = this.courses[i].phase;
             this.editForm.price = this.courses[i].pricePerTerm;
             this.editForm.sections =this.courses[i].numberPerTerm;
+            this.editForm.totalFee = this.courses[i].pricePerTerm * this.editForm.periods;
+            this.editForm.totalSections =  this.courses[i].numberPerTerm + this.editForm.attachSections;
           }
         }
       },

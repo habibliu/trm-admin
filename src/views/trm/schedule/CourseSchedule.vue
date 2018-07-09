@@ -135,7 +135,7 @@
             </el-table-column>
             <el-table-column prop="name" label="学员姓名" width="120" sortable>
             </el-table-column>
-            <el-table-column prop="sections" label="课程节数" width="120" sortable>
+            <el-table-column prop="totalSections" label="课程节数" width="120" sortable>
             </el-table-column>
             <el-table-column prop="beingSchedule" label="待排期" min-width="120" sortable>
             </el-table-column>
@@ -256,6 +256,7 @@
         getCourseStudents(para).then((res) => {
           if( res && res.data){
             this.students = res.data;
+            debugger;
             setTimeout(() => {
               this.students.forEach(item => {
                 this.$refs.studentTable.toggleRowSelection(item,true);

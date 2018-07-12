@@ -46,7 +46,7 @@
       </el-table-column>
       <el-table-column prop="courseName" label="课程名称" width="180" sortable>
       </el-table-column>
-       <el-table-column prop="courseGrade" label="课程级别" width="120" :formatter="formatGrade" sortable>
+       <el-table-column prop="courseLevel" label="课程级别" width="120" :formatter="formatLevel" sortable>
       </el-table-column>
        <el-table-column prop="coursePhase" label="课程阶段" width="120" :formatter="formatPhase" sortable>
       </el-table-column>
@@ -168,7 +168,7 @@
            <el-form-item label="阶段">
               <el-select v-model="editForm.phase" placeholder="请选择" :disabled=true>
                 <el-option
-                :remote-method="getCoursesPhases"
+                :remote-method="getCoursePhases"
                 v-for="item in coursePhases"
                 :key="item.id"
                 :label="item.itemName"
@@ -192,7 +192,7 @@
                 <el-input-number v-model="editForm.attachSections"   size="small"
                 @change="attachSectionsChange">
                 </el-input-number>
-                <el-checkbox v-model="checked">自动</el-checkbox>
+                <el-checkbox v-model="editForm.auto">自动</el-checkbox>
               </template>
             </el-form-item>
           </el-col>
@@ -204,7 +204,7 @@
               <el-input v-model="editForm.totalSections" :disabled=true></el-input>
             </el-form-item>
             <el-form-item label="学费已缴" >
-              <el-checkbox v-model="checked"></el-checkbox>
+              <el-checkbox v-model="editForm.payoff"></el-checkbox>
             </el-form-item>
             <el-form-item label="缴费日期" >
               <el-date-picker v-model="editForm.paymentDate" type="date"></el-date-picker>
@@ -227,7 +227,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getDictionaryList, getSchoolList } from './api';
+  import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getDictionaryList } from './api';
 
   export default {
     data() {
@@ -276,6 +276,8 @@
           totalFee: 0,
           totalSections:0,
           attachSections:0,
+          payoff: 1,
+          auto: 1
         }
 
       }
@@ -328,10 +330,10 @@
       },
       getSchools() {//获取学校列表
         let para = {
-          //name: this.editForm.school,
+          typeCode: 'SCHOOL',
         };
         this.loading  = true;
-        getSchoolList(para).then((res) => {
+        getDictionaryList(para).then((res) => {
           if( res && res.data){
             this.schools = res.data;
           }
@@ -365,10 +367,11 @@
           }
         }
       },
-      getCoursesGrade(){
+      getCourseGrades(){
         let para = {
           typeCode: 'COURSE-GRADE',
         };
+        debugger;
         getDictionaryList(para).then((res) => {
           if( res && res.data){
             this.courseGrades = res.data;
@@ -377,10 +380,11 @@
           console.log(error);
         });
       },
-      getCoursesPhases(){
+      getCoursePhases(){
         let para = {
           typeCode: 'COURSE-PHASE',
         };
+        debugger;
         getDictionaryList(para).then((res) => {
           if( res && res.data){
             this.coursePhases = res.data;
@@ -431,7 +435,9 @@
           periods: 0,
           totalFee: 0,
           totalSections:0,
-          attachSections:0
+          attachSections:0,
+          payoff: 1,
+          auto: 1
         };
       },
       //显示编辑界面
@@ -476,7 +482,7 @@
           }
         });
       },
-      //新增
+      //新增/更新
       handleSubmit: function () {
         this.$refs.editForm.validate((valid) => {
           if (valid) {
@@ -486,17 +492,33 @@
               debugger;
               let para = Object.assign({}, this.editForm);
               para.birthDateDate = (!para.birthDateDate || para.birthDateDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
-              addRegistration(para).then((res) => {
-                this.addLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
+
+              if(this.editForm.id !=null && this.editForm.id != ''){
+                editRegistration(para).then((res) => {
+                  this.addLoading = false;
+                  //NProgress.done();
+                  this.$message({
+                    message: '提交成功',
+                    type: 'success'
+                  });
+                  this.$refs['editForm'].resetFields();
+                  this.editFormVisible = false;
+                  this.getRegistrations();
                 });
-                this.$refs['editForm'].resetFields();
-                this.editFormVisible = false;
-                this.getRegistrations();
-              });
+              }else{
+                addRegistration(para).then((res) => {
+                  this.addLoading = false;
+                  //NProgress.done();
+                  this.$message({
+                    message: '提交成功',
+                    type: 'success'
+                  });
+                  this.$refs['editForm'].resetFields();
+                  this.editFormVisible = false;
+                  this.getRegistrations();
+                });
+              }
+              
             });
           }
         });

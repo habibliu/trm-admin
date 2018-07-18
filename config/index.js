@@ -78,6 +78,10 @@ module.exports = {
         '/Registion': {
             target: 'http://localhost:8100',
             changeOrigin: true
+        },
+        '/Dictionary': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
         }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

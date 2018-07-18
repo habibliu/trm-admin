@@ -14,7 +14,7 @@ export const batchRemoveRegistration = params => { return axios.get(`${base}/Reg
 
 export const editRegistration = params => { 
 	var par=JSON.stringify(params);
-	return axios.post(`${base}/Registion/edit`,  par).then(res => res.data); 
+	return axios.post(`${base}/Registion/update`,  par).then(res => res.data); 
 };
 
 export const addRegistration = params => { 
@@ -28,10 +28,6 @@ export const getCourseList = params => {
 };
 //获取数据字典
 export const getDictionaryList = params => { 
+	debugger;
 	return axios.get(`${base}/Dictionary/list`, {params:{params:params}}).then(res => res.data); 
 };
-
-//获取学校列表
-export const getSchoolList = params => { 
-	return axios.get(`${base}/Registion/listSchools`, {params:{params:params}}).then(res => res.data); 
-}

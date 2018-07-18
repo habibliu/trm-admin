@@ -7,8 +7,34 @@ module.exports = {
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/trm-admin/',
+    assetsPublicPath: './',
     productionSourceMap: true,
+    proxyTable: {
+        '/login': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Student': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Coach': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Course': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Venue': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        },
+        '/Registion': {
+            target: 'http://localhost:8100',
+            changeOrigin: true
+        }
+    },
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
     // Before setting to `true`, make sure to:

@@ -11,27 +11,27 @@ module.exports = {
     productionSourceMap: true,
     proxyTable: {
         '/login': {
-            target: 'http://localhost:8100',
+            target: 'http://139.159.214.95:8100',
             changeOrigin: true
         },
         '/Student': {
-            target: 'http://localhost:8100',
+            target: 'http://139.159.214.95:8100',
             changeOrigin: true
         },
         '/Coach': {
-            target: 'http://localhost:8100',
+            target: 'http://139.159.214.95:8100',
             changeOrigin: true
         },
         '/Course': {
-            target: 'http://localhost:8100',
+            target: 'http://139.159.214.95:8100',
             changeOrigin: true
         },
         '/Venue': {
-            target: 'http://localhost:8100',
+            target: 'http://139.159.214.95:8100',
             changeOrigin: true
         },
         '/Registion': {
-            target: 'http://localhost:8100',
+            target: 'http://139.159.214.95:8100',
             changeOrigin: true
         }
     },

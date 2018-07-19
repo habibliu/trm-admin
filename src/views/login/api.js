@@ -1,7 +1,7 @@
 import Axios from '@/common/js/AxiosPlugin'
 import qs from 'qs';
 
-let base = '';
+let base = 'http://139.159.214.95:8100';
 
 export const requestLogin = params => { 
 	return Axios.post(`${base}/login`, qs.stringify(params),{'headers':{'Content-Type':'application/x-www-form-urlencoded'}}).then(res => res.data); 

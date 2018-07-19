@@ -6,7 +6,8 @@ import { catchError } from '@/common/js/util.js'
 
 const Axios = axios.create({
   baseUrl:'http://39.159.214.95:8100',
-  timeout: 60000
+  timeout: 60000,
+  withCredentials :true
 })
 
 // 暂时不启用过滤

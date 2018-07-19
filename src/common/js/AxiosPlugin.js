@@ -5,7 +5,7 @@ import axios from 'axios'
 import { catchError } from '@/common/js/util.js'
 
 const Axios = axios.create({
-  baseUrl:process.env.API_URL,
+  baseUrl:'http://39.159.214.95:8100',
   timeout: 60000
 })
 

@@ -51,6 +51,7 @@ router.beforeEach((to, from, next) => {
 //router.afterEach(transition => {
 //NProgress.done();
 //});
+
 Vue.prototype.$http = axios;
 new Vue({
   //el: '#app',

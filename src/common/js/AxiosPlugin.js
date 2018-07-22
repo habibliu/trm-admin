@@ -5,19 +5,21 @@ import axios from 'axios'
 import { catchError } from '@/common/js/util.js'
 
 const Axios = axios.create({
-  baseUrl:'http://39.159.214.95:8100',
+  //baseUrl:'http://localhost:8100',
   timeout: 60000,
-  withCredentials :true
+  //withCredentials : true,
+  crossDomain : true
 })
 
 // 暂时不启用过滤
 // 添加请求拦截器
 Axios.defaults.headers['Cache-Control'] = 'no-cache'
 Axios.defaults.headers['Pragma'] = 'no-cache'
-
+Axios.defaults.baseURL="http://localhost:8100"
+//Axios.defaults.withCredentials=true
 Axios.interceptors.request.use(config => {
   if (config.url=='/login'){//如果请求的地址为/login,Content-Type用表单形式
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
   }else{//其余请求，请json提交
     config.headers['Content-Type'] = 'application/json; charset=UTF-8';
   }
@@ -28,7 +30,7 @@ Axios.interceptors.request.use(config => {
   if (sessionStorage.token) {
     config.headers.Authorization = sessionStorage.token
   }
-  config.headers.FrontType = 'admin-ui'
+  //config.headers.FrontType = 'admin-ui'
   return config
 }, error => {
   return Promise.reject(error)

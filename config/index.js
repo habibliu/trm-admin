@@ -9,32 +9,6 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
     productionSourceMap: true,
-    proxyTable: {
-        '/login': {
-            target: 'http://139.159.214.95:8100',
-            changeOrigin: true
-        },
-        '/Student': {
-            target: 'http://139.159.214.95:8100',
-            changeOrigin: true
-        },
-        '/Coach': {
-            target: 'http://139.159.214.95:8100',
-            changeOrigin: true
-        },
-        '/Course': {
-            target: 'http://139.159.214.95:8100',
-            changeOrigin: true
-        },
-        '/Venue': {
-            target: 'http://139.159.214.95:8100',
-            changeOrigin: true
-        },
-        '/Registion': {
-            target: 'http://139.159.214.95:8100',
-            changeOrigin: true
-        }
-    },
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
     // Before setting to `true`, make sure to:
@@ -54,36 +28,37 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {
-        '/login': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        },
-        '/Student': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        },
-        '/Coach': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        },
-        '/Course': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        },
-        '/Venue': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        },
-        '/Registion': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        },
-        '/Dictionary': {
-            target: 'http://localhost:8100',
-            changeOrigin: true
-        }
-    },
+    proxyTable:{},
+    // proxyTable: {
+    //     '/login': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     },
+    //     '/Student': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     },
+    //     '/Coach': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     },
+    //     '/Course': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     },
+    //     '/Venue': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     },
+    //     '/Registion': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     },
+    //     '/Dictionary': {
+    //         target: 'http://localhost:8100',
+    //         changeOrigin: true
+    //     }
+    // },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

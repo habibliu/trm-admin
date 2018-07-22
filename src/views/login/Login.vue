@@ -65,7 +65,7 @@
                     //保存登录用户信息到session中
                     sessionStorage.setItem('user', JSON.stringify(data));
                     //登录成功后，默认路由到组织架构页面
-                    this.$router.push({ path: '/Organization' });
+                    this.$router.push({ path: '/CourseRegistration' });
                   }
                 });
                 this.logining = false;

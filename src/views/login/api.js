@@ -5,7 +5,9 @@ let base = 'http://139.159.214.95:8100';
 
 export const requestLogin = params => { 
 	debugger;
-	return Axios.post('http://139.159.214.95:8100/login', qs.stringify(params),{'headers':{'Content-Type':'application/x-www-form-urlencoded'}}).then(res => res.data); 
+	//var par=JSON.stringify(params);
+	//return Axios.post('/login',par,{'headers':{'Content-Type':'application/x-www-form-urlencoded'}}).then(res => res.data); 
+	return Axios.get('/login',{params:{params:params}}).then(res => res.data); 
 };
 
 export const getUserList = params => { return Axios.get(`${base}/user/list`, { params: params }); };

@@ -18,11 +18,11 @@ Axios.defaults.headers['Pragma'] = 'no-cache'
 Axios.defaults.baseURL="http://localhost:8100"
 //Axios.defaults.withCredentials=true
 Axios.interceptors.request.use(config => {
-  if (config.url=='/login'){//如果请求的地址为/login,Content-Type用表单形式
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
-  }else{//其余请求，请json提交
+  //if (config.url=='/login'){//如果请求的地址为/login,Content-Type用表单形式
+  //  config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+  //}else{//其余请求，请json提交
     config.headers['Content-Type'] = 'application/json; charset=UTF-8';
-  }
+  //}
   // 用户登录后,存储token，发送请求时，设置token sessionStorage.token
   // 前端Header中需要传入FrontType字段：
   //  admin-ui  管理平台

@@ -166,8 +166,7 @@
           debugger;
           if( res && res.data){
             this.total = res.data.total;
-            this.venues = res.data.venues;
-          
+            this.venues = res.data.rows;
           }
           this.listLoading = false;
         }).catch((error) => {

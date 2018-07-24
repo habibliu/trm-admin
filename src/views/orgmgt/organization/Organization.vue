@@ -111,10 +111,11 @@
 </template>
 
 <script>
-  
-  import { getTreeData, removeOrganization, editOrganization, addOrganization } from './api';
+  import {formatDate,calAge} from '@/common/js/util'
+  import { getTreeData, removeOrganization, editOrganization, addOrganization } from './api'
   //import  jp from 'jsonpath';
-  var jp = require('JSONPath');
+  //import jsonpath
+  var jp = require('jsonpath')
   export default {
    
      watch: {
@@ -140,7 +141,6 @@
 
       },
       handleNodeClick(data){
-       
         var parentNode=jp(this.treeData,'$..code[?(@.code==data.code)]');
         this.selectedNode=data;
         console.log(this.selectedNode);
@@ -161,7 +161,6 @@
         getTreeData(para).then((res) => {
           if( res && res.data){
             this.treeData = res.data.treeData;
-          
           }
           this.loading = false;
         }).catch((error) => {

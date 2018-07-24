@@ -15,7 +15,9 @@ const Axios = axios.create({
 // 添加请求拦截器
 Axios.defaults.headers['Cache-Control'] = 'no-cache'
 Axios.defaults.headers['Pragma'] = 'no-cache'
-Axios.defaults.baseURL="http://localhost:8100"
+//Axios.defaults.baseURL="http://139.159.214.95:8100"
+Axios.defaults.baseURL = process.env.API_URL
+
 //Axios.defaults.withCredentials=true
 Axios.interceptors.request.use(config => {
   //if (config.url=='/login'){//如果请求的地址为/login,Content-Type用表单形式
@@ -56,6 +58,5 @@ Axios.interceptors.response.use(response => {
   return catchError(error)
 })
 
-let base = '';
 
 export default Axios

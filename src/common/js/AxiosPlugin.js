@@ -5,7 +5,6 @@ import axios from 'axios'
 import { catchError } from '@/common/js/util.js'
 
 const Axios = axios.create({
-  //baseUrl:'http://localhost:8100',
   timeout: 60000,
   //withCredentials : true,
   crossDomain : true

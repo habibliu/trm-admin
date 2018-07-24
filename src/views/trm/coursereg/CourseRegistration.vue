@@ -101,7 +101,7 @@
               <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
-              <el-input-number v-model="editForm.age" :disabled=true></el-input-number>
+              <el-input-number v-model="editForm.age" :disabled=false></el-input-number>
             </el-form-item>
             <el-form-item label="身高">
               <el-input-number v-model="editForm.height" ></el-input-number>

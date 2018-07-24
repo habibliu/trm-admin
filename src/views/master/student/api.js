@@ -22,7 +22,15 @@ export const addStudent = params => {
 	var par=JSON.stringify(params);
 	return axios.post(`/Student/add`, par).then(res => res.data);
 };
-//获取学校列表
-export const getSchoolList = params => {
-	return axios.get(`/Student/listSchools`, {params:{params:params}}).then(res => res.data);
+
+
+//获取数据字典
+export const getDictionaryList = params => { 
+	return axios.get(`/Dictionary/list`, {params:{params:params}}).then(res => res.data); 
+};
+
+export const addSchool = params => {
+	debugger;
+	var par=JSON.stringify(params);
+	return axios.post(`/Dictionary/add`, par).then(res => res.data);
 };

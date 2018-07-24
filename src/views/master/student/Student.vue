@@ -98,14 +98,14 @@
               <el-input-number v-model="editForm.height" ></el-input-number>
             </el-form-item>
             <el-form-item label="就读学校">
-              <el-select v-model="editForm.school" filterable placeholder="请选择">
+              <el-select v-model="editForm.school" filterable allow-create default-first-option @change="createSchoolItem" placeholder="请选择">
                 <el-option
                   :remote-method="getSchools"
                   :loading="loading"
                   v-for="item in schools"
                   :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
+                  :label="item.itemName"
+                  :value="item.itemCode">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -180,20 +180,20 @@
               <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birthDate"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
-              <el-input-number v-model="addForm.age" :disabled=true></el-input-number>
+              <el-input-number v-model="addForm.age" :disabled=false></el-input-number>
             </el-form-item>
             <el-form-item label="身高">
               <el-input-number v-model="addForm.height" ></el-input-number>
             </el-form-item>
             <el-form-item label="就读学校">
-              <el-select v-model="addForm.school" filterable placeholder="请选择">
+              <el-select v-model="addForm.school" filterable allow-create default-first-option @change="createSchoolItem" placeholder="请选择">
                 <el-option
                   :remote-method="getSchools"
                   :loading="loading"
                   v-for="item in schools"
                   :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
+                  :label="item.itemName"
+                  :value="item.itemCode">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -248,7 +248,7 @@
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
   import defaultPicture from './assets/images/james1.jpg'
-  import { getStudentListPage, removeStudent, batchRemoveStudent, editStudent, addStudent, getSchoolList } from './api';
+  import { getStudentListPage, removeStudent, batchRemoveStudent, editStudent, addStudent, getDictionaryList,addSchool } from './api';
   export default {
     data() {
       return {
@@ -363,16 +363,32 @@
       },
       getSchools() {
         let para = {
-          name: this.filters.name,
+          typeCode: 'SCHOOL',
         };
         this.loading  = true;
-        getSchoolList(para).then((res) => {
+        getDictionaryList(para).then((res) => {
           if( res && res.data){
-            this.schools = res.data.schools;
+            this.schools = res.data;
           }
           this.loading  = false;
         }).catch((error) => {
           this.loading  = false;
+          console.log(error);
+        });
+      },
+      createSchoolItem(){
+        debugger;
+        let dict={};
+        if(this.addFormVisible){
+            dict.itemName=this.addForm.school;
+        }else if(this.editFormVisible){
+            dict.itemName=this.editForm.school;
+        }
+        dict.typeCode='SCHOOL';
+        dict.typeName='学校';
+        addSchool(dict).then((res) => {
+          console.log(res.dat);
+        }).catch((error) => {
           console.log(error);
         });
       },

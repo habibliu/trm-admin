@@ -89,7 +89,7 @@
               <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate" @change="birthDateChanged"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
               <el-input-number v-model="editForm.age" :disabled=true></el-input-number>
@@ -177,7 +177,7 @@
               <el-input v-model="addForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birthDate"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birthDate" @change="birthDateChanged"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
               <el-input-number v-model="addForm.age" :disabled=false></el-input-number>
@@ -341,6 +341,14 @@
         this.page = val;
         this.getStudents();
       },
+      birthDateChanged:function(val){
+        var  age=calAge(val.getTime());
+        if(this.addFormVisible){
+          this.addForm.age=age;
+        }else{
+          this.editForm.age=age;
+        }
+      },
       //获取学生列表
       getStudents() {
         let para = {
@@ -387,7 +395,9 @@
         dict.typeCode='SCHOOL';
         dict.typeName='学校';
         addSchool(dict).then((res) => {
+          debugger;
           console.log(res.dat);
+          //要遍历school,匹配项目，补上itemCode信息
         }).catch((error) => {
           console.log(error);
         });
@@ -418,6 +428,8 @@
         this.getSchools();
         this.editFormVisible = true;
         this.editForm = Object.assign({}, row);
+        var  age=calAge(this.editForm.birthDate);
+        this.editForm.age=age;
       },
       //显示新增界面
       handleAdd: function () {

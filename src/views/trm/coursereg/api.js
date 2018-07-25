@@ -28,3 +28,8 @@ export const getDictionaryList = params => {
 	debugger;
 	return axios.get(`/Dictionary/list`, {params:{params:params}}).then(res => res.data); 
 };
+export const addSchool = params => {
+	debugger;
+	var par=JSON.stringify(params);
+	return axios.post(`/Dictionary/add`, par).then(res => res.data);
+};

@@ -98,7 +98,7 @@
               <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"  @change="birthDateChanged"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
               <el-input-number v-model="editForm.age" :disabled=false></el-input-number>
@@ -107,7 +107,7 @@
               <el-input-number v-model="editForm.height" ></el-input-number>
             </el-form-item>
             <el-form-item label="就读学校">
-              <el-select v-model="editForm.school" filterable placeholder="请选择">
+              <el-select v-model="editForm.school" filterable allow-create default-first-option @change="createSchoolItem" placeholder="请选择">
                 <el-option
                   :remote-method="getSchools"
                   :loading="loading"
@@ -227,7 +227,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getDictionaryList } from './api';
+  import { getRegistrationListPage, removeRegistration, batchRemoveRegistration, editRegistration, addRegistration,getCourseList,getDictionaryList,addSchool } from './api';
 
   export default {
     data() {
@@ -302,6 +302,10 @@
         this.page = val;
         this.getRegistrations();
       },
+      birthDateChanged:function(val){
+        var  age=calAge(val.getTime());
+        this.editForm.age=age;
+      },
       periodsChange:function(value){
         this.editForm.totalFee=this.editForm.price * value;
         this.editForm.totalSections =  this.editForm.sections * value + this.editForm.attachSections;
@@ -343,6 +347,20 @@
           console.log(error);
         });
       },
+      createSchoolItem(){
+        debugger;
+        let dict={};
+        dict.itemName=this.editForm.school;
+        dict.typeCode='SCHOOL';
+        dict.typeName='学校';
+        addSchool(dict).then((res) => {
+          debugger;
+          console.log(res.dat);
+          //要遍历school,匹配项目，补上itemCode信息
+        }).catch((error) => {
+          console.log(error);
+        });
+      },
       getCourses(){//获取课程列表
         let para = {
           name: '',
@@ -371,7 +389,6 @@
         let para = {
           typeCode: 'COURSE-GRADE',
         };
-        debugger;
         getDictionaryList(para).then((res) => {
           if( res && res.data){
             this.courseGrades = res.data;

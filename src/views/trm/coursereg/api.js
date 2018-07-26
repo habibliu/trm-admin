@@ -16,7 +16,6 @@ export const editRegistration = params => {
 
 export const addRegistration = params => { 
 	var par=JSON.stringify(params);
-	debugger;
 	return axios.post(`/Registion/add`, par).then(res => res.data); 
 };
 //获取课程列表
@@ -25,11 +24,9 @@ export const getCourseList = params => {
 };
 //获取数据字典
 export const getDictionaryList = params => { 
-	debugger;
 	return axios.get(`/Dictionary/list`, {params:{params:params}}).then(res => res.data); 
 };
 export const addSchool = params => {
-	debugger;
 	var par=JSON.stringify(params);
 	return axios.post(`/Dictionary/add`, par).then(res => res.data);
 };

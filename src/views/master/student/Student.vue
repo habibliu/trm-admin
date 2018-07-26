@@ -398,6 +398,7 @@
           debugger;
           console.log(res.dat);
           //要遍历school,匹配项目，补上itemCode信息
+          this.shools.push(res.data)
         }).catch((error) => {
           console.log(error);
         });

@@ -30,15 +30,15 @@
       </el-table-column>
       <el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
       </el-table-column>
-      <el-table-column prop="birthDateDate" label="生日" width="100" sortable>
+      <el-table-column prop="birthDate" label="生日" width="100" :formatter="formatBirthDate" sortable>
       </el-table-column>
-      <el-table-column prop="age" label="年龄" width="100" sortable>
+      <el-table-column prop="age" label="年龄" width="100" :formatter="formatAge"sortable>
       </el-table-column>
       <el-table-column prop="school" label="在读学校" width="180" sortable>
       </el-table-column>
       <el-table-column prop="phone" label="学员电话" width="140" sortable>
       </el-table-column>
-      <el-table-column prop="registerDate" label="报名日期" width="120" sortable>
+      <el-table-column prop="registerDate" label="报名日期" width="120" :formatter="formatRegistDate" sortable>
       </el-table-column>
       <el-table-column prop="periods" label="报名期数" width="120" sortable>
       </el-table-column>
@@ -46,7 +46,7 @@
       </el-table-column>
       <el-table-column prop="courseName" label="课程名称" width="180" sortable>
       </el-table-column>
-       <el-table-column prop="courseLevel" label="课程级别" width="120" :formatter="formatLevel" sortable>
+       <el-table-column prop="courseLevel" label="课程级别" width="120" :formatter="formatGrade" sortable>
       </el-table-column>
        <el-table-column prop="coursePhase" label="课程阶段" width="120" :formatter="formatPhase" sortable>
       </el-table-column>
@@ -54,7 +54,7 @@
       </el-table-column>
       <el-table-column prop="payoff" label="是否已缴纳" width="120" :formatter="formatPayoff" sortable>
       </el-table-column>
-      <el-table-column prop="paymentDate" label="缴费日期" width="120" sortable>
+      <el-table-column prop="paymentDate" label="缴费日期" width="120" :formatter="formatRegistDate" sortable>
       </el-table-column>
       
       <el-table-column label="操作" width="150" fixed="right">
@@ -156,7 +156,6 @@
             <el-form-item label="级别">
               <el-select v-model="editForm.grade" placeholder="请选择" :disabled=true>
                 <el-option
-                :remote-method="getCourseGrades"
                 v-for="item in courseGrades"
                 :key="item.id"
                 :label="item.itemName"
@@ -168,7 +167,6 @@
            <el-form-item label="阶段">
               <el-select v-model="editForm.phase" placeholder="请选择" :disabled=true>
                 <el-option
-                :remote-method="getCoursePhases"
                 v-for="item in coursePhases"
                 :key="item.id"
                 :label="item.itemName"
@@ -285,18 +283,35 @@
     methods: {
       //性别显示转换
       formatSex: function (row, column) {
-        return row.studentSex == 1 ? '男' : row.studentSex == 0 ? '女' : '未知';
+        return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
       },
       formatPayoff: function (row, column) {
         return row.payoff == 1 ? '已付' : row.payoff == 0 ? '未付' : '未付';
       },
       formatGrade: function (row, column) {
-        //return this.courseGrades[row.level].itemName;
-        return row.level
+        for(var i = 0,len=this.courseGrades.length; i < len; i++) {
+          if(this.courseGrades[i].itemCode==row.courseLevel){
+            return this.courseGrades[i].itemName;
+          }
+        }
+        return row.courseLevel
       },
       formatPhase: function (row, column){
-        //return row.coursePhase[row.phase].itemName;
-        return row.phase
+        for(var i = 0,len=this.coursePhases.length; i < len; i++) {
+          if(this.coursePhases[i].itemCode==row.coursePhase){
+            return this.coursePhases[i].itemName;
+          }
+        }
+        return row.coursePhase;
+      },
+      formatBirthDate: function(row,column){
+        return  formatDate(row.birthDate,"yyyy-MM-dd");
+      },
+      formatAge:function(row,column){
+        return calAge(row.birthDate);
+      },
+      formatRegistDate:function(row,column){
+        return  formatDate(row.registerDate,"yyyy-MM-dd");
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -348,15 +363,13 @@
         });
       },
       createSchoolItem(){
-        debugger;
         let dict={};
         dict.itemName=this.editForm.school;
         dict.typeCode='SCHOOL';
         dict.typeName='学校';
         addSchool(dict).then((res) => {
-          debugger;
           console.log(res.dat);
-          //要遍历school,匹配项目，补上itemCode信息
+          this.shools.push(res.data)
         }).catch((error) => {
           console.log(error);
         });
@@ -401,7 +414,6 @@
         let para = {
           typeCode: 'COURSE-PHASE',
         };
-        debugger;
         getDictionaryList(para).then((res) => {
           if( res && res.data){
             this.coursePhases = res.data;
@@ -463,6 +475,8 @@
         this.editFormVisible = true;
         this.clearFormData();
         this.editForm = Object.assign({}, row);
+        var  age=calAge(this.editForm.birthDate);
+        this.editForm.age=age;
       },
       //显示新增界面
       handleAdd: function () {
@@ -506,7 +520,6 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
               //NProgress.start();
-              debugger;
               let para = Object.assign({}, this.editForm);
               para.birthDateDate = (!para.birthDateDate || para.birthDateDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
 
@@ -571,6 +584,8 @@
       this.getRegistrations();
       this.getSchools();
       this.getCourses();
+      this.getCourseGrades();
+      this.getCoursePhases();
     }
   }
 

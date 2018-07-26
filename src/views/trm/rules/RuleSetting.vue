@@ -23,7 +23,7 @@
       </el-table-column>
       <el-table-column prop="courseName" label="课程名称 " width="180" sortable>
       </el-table-column>
-      <el-table-column prop="periods" label="报名期数" width="120"  sortable>
+      <el-table-column prop="subscribePeriods" label="报名期数" width="120"  sortable>
       </el-table-column>
       <el-table-column prop="freeSections" label="赠送节数" width="120" sortable>
       </el-table-column>
@@ -47,11 +47,19 @@
     <!--编辑界面-->
     <el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
       <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-        <el-form-item label="课程名称" prop="courseName">
-          <el-input v-model="editForm.courseName" auto-complete="off"></el-input>
+        <el-form-item label="课程名称" prop="courseId">
+          <el-select v-model="editForm.courseId" filterable placeholder="请选择" >
+            <el-option
+              v-for="item in courses"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="报名期数">
-          <el-input-number  v-model="editForm.periods"></el-input-number>
+          <el-input-number  v-model="editForm.subscribePeriods"></el-input-number>
         </el-form-item>
         <el-form-item label="赠送节数">
           <el-input-number v-model="editForm.freeSections"></el-input-number>
@@ -69,11 +77,19 @@
     <!--新增界面-->
     <el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-        <el-form-item label="课程名称" prop="courseName">
-          <el-input v-model="addForm.courseName" auto-complete="off"></el-input>
+        <el-form-item label="课程名称" prop="courseId">
+          <el-select v-model="addForm.courseId" filterable placeholder="请选择" >
+            <el-option
+              v-for="item in courses"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="报名期数">
-          <el-input-number v-model="addForm.periods"></el-input-number>
+          <el-input-number v-model="addForm.subscribePeriods"></el-input-number>
         </el-form-item>
         <el-form-item label="赠送节数">
           <el-input-number v-model="addForm.freeSections" ></el-input-number>
@@ -91,9 +107,9 @@
 </template>
 
 <script>
-  import util from '../../../common/js/util'
+  import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getRuleListPage, removeRule, batchRemoveRule, editRule, addRule } from './api';
+  import { getRuleListPage, removeRule, batchRemoveRule, editRule, addRule,getCourseList } from './api';
 
   export default {
     data() {
@@ -102,6 +118,7 @@
           courseName: '',
         },
         rules: [],
+        courses: [],
         total: 0,
         page: 1,
         listLoading: false,
@@ -117,8 +134,8 @@
         //编辑界面数据
         editForm: {
           id: 0,
-          courseName: '',
-          periods: -1,
+          courseId: '',
+          subscribePeriods: -1,
           freeSections: 0,
           memo: '',
         },
@@ -132,8 +149,8 @@
         },
         //新增界面数据
         addForm: {
-          courseName: '',
-          periods: -1,
+          courseId: '',
+          subscribePeriods: -1,
           freeSections: 0,
           memo: '',
         }
@@ -152,20 +169,32 @@
       //获取家长列表
       getRules() {
         let para = {
-          page: this.page,
           courseName: this.filters.courseName,
         };
+        let page={ 'currentPage': this.page,'pageSize':10};
         this.listLoading = true;
-        getRuleListPage(para).then((res) => {
+        getRuleListPage(para,page).then((res) => {
           debugger;
           if( res && res.data){
             this.total = res.data.total;
-            this.rules = res.data.rules;
+            this.rules = res.data.rows;
           
           }
           this.listLoading = false;
         }).catch((error) => {
           this.listLoading = false;
+          console.log(error);
+        });
+      },
+      getCourses(){//获取课程列表
+        let para = {
+          payoff: 1,
+        };
+        getCourseList(para).then((res) => {
+          if( res && res.data){
+            this.courses = res.data;
+          }
+        }).catch((error) => {
           console.log(error);
         });
       },
@@ -283,6 +312,7 @@
     },
     mounted() {//默认页面加截方法
       this.getRules();
+      this.getCourses();
     }
   }
 

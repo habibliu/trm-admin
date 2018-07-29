@@ -98,7 +98,7 @@
               <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"  @change="birthDateChanged"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"  @change="birthDateChanged" class="input-class"></el-date-picker>
             </el-form-item>
             <el-form-item label="年龄">
               <el-input-number v-model="editForm.age" :disabled=false></el-input-number>
@@ -122,7 +122,7 @@
           </el-col>
           <el-col :span="6"><div class="grid-content bg-purple"></div>
              <el-form-item label="注册日期">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.registerDate"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.registerDate" class="input-class"></el-date-picker>
             </el-form-item>
             <el-form-item label="家长姓名" prop="parentName">
               <el-input v-model="editForm.parentName" filterable placeholder="请输入家姓名" ></el-input>
@@ -205,7 +205,7 @@
               <el-checkbox v-model="editForm.payoff"></el-checkbox>
             </el-form-item>
             <el-form-item label="缴费日期" >
-              <el-date-picker v-model="editForm.paymentDate" type="date"></el-date-picker>
+              <el-date-picker v-model="editForm.paymentDate" type="date" class="input-class"></el-date-picker>
             </el-form-item>
           </el-col>
         </el-row>
@@ -598,5 +598,8 @@
   line-height: 24px;
   font-size: 18px;
   color: #303133;
+}
+.input-class{
+    width: 226px;
 }
 </style>

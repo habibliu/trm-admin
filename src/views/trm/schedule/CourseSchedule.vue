@@ -39,7 +39,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="教学日期" prop="date">
-            <el-date-picker type="dates" placeholder="选择一个或多个日期" v-model="addForm.dates"  size="mini"></el-date-picker>
+            <el-date-picker type="dates" placeholder="选择一个或多个日期" v-model="addForm.dates"  size="mini" class="input-class"></el-date-picker>
           </el-form-item>
           <el-form-item label="教学时间">
             <el-time-picker
@@ -52,7 +52,7 @@
               start-placeholder="开始时间"
               end-placeholder="结束时间"
               placeholder="选择时间范围"
-              style="width:200px;">
+              class="input-class">
             </el-time-picker>
           </el-form-item>
         </el-form>
@@ -61,23 +61,22 @@
           </el-table-column>
           <el-table-column type="index" width="60">
           </el-table-column>
-          <el-table-column prop="name" label="学员姓名" width="120" sortable>
+          <el-table-column prop="name" label="学员姓名" width="100" >
           </el-table-column>
-          <el-table-column prop="sections" label="课程节数" width="120" sortable>
+          <el-table-column prop="totalSections" label="课程节数" width="100">
           </el-table-column>
-          <el-table-column prop="beingSchedule" label="待排期" min-width="120" sortable>
+          <el-table-column prop="arrangeedSections" label="已排期" width="100">
           </el-table-column>
-          
         </el-table>
 
       </el-col>
       <el-col :span="1"><div class="grid-content bg-purple"></div>
         <div class="button-container">
           <div class="arrange-button">
-            <el-button type="primary"  @click="appendSchedule"  size="mini">>></el-button>
+            <el-button type="primary"  @click="appendSchedule" icon='el-icon-d-arrow-right' size="mini"></el-button>
           </div>
           <div class="arrange-button">
-            <el-button type="primary" @click="removeSchedule"  size="mini"><<</el-button>
+            <el-button type="primary" @click="removeSchedule" icon='el-icon-d-arrow-left' size="mini"></el-button>
           </div>
         </div>
       </el-col>
@@ -93,13 +92,27 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="false">
+    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="false" width="60%">
       <el-row :gutter="20">
         <el-col :span="8"><div class="grid-content bg-purple"></div>
           <el-form :model="detailForm" label-width="80px"  ref="detailForm">
             <el-form-item label="教学日期">
-              <el-date-picker type="date"  v-model="detailForm.date" :disabled="true"></el-date-picker>
+              <el-date-picker type="date"  v-model="detailForm.date" :disabled="true" ></el-date-picker>
             </el-form-item>
+            <el-form-item label="教学时间">
+            <el-time-picker
+              is-range
+              :disabled="true"
+              clear-icon
+              value-format="HH:mm"
+              v-model="detailForm.timeSpan"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              placeholder="选择时间范围"
+              class="input-class">
+            </el-time-picker>
+          </el-form-item>
             <el-form-item label="课程名称" >
               <el-input v-model="detailForm.courseName" auto-complete="off" :disabled="true"></el-input>
             </el-form-item>
@@ -137,7 +150,7 @@
             </el-table-column>
             <el-table-column prop="totalSections" label="课程节数" width="120" sortable>
             </el-table-column>
-            <el-table-column prop="beingSchedule" label="待排期" min-width="120" sortable>
+            <el-table-column prop="arrangeSections" label="已排期" min-width="120" sortable>
             </el-table-column>
           </el-table>
         </el-col>
@@ -204,6 +217,7 @@
           coach: '',
           venue: '',
           date: '',
+          timeSpan: '',
           students: []
         }
       }
@@ -327,6 +341,7 @@
         this.detailForm.coach=event.DATA.coachId;
         this.detailForm.venue=event.DATA.venueId;
         this.detailForm.date=event.DATA.date;
+        this.detailForm.timeSpan=event.DATA.timeSpan;
         this.detailForm.students=event.DATA.students;
         console.log(event);
 
@@ -414,5 +429,8 @@
 .footer{
   display: table-cell;  
   vertical-align: middle; 
+}
+.input-class{
+    width: 206px;
 }
 </style>

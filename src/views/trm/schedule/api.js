@@ -19,3 +19,13 @@ export const getCourseStudents = params => {
 export const getScheduleListPage = params => { 
   return axios.get(`/CourseSchedule/listpage`, {params:{params:params}}).then(res => res.data);
 };
+export const addSchedule = params => { 
+	var par=JSON.stringify(params);
+	return axios.post(`/CourseSchedule/add`, par).then(res => res.data); 
+};
+
+export const batchAddSchedule = params => { 
+	var par=JSON.stringify(params);
+	debugger;
+	return axios.post(`/CourseSchedule/batchAdd`, par).then(res => res.data); 
+};

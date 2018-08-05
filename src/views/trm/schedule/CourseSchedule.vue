@@ -16,8 +16,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="教练" prop="coach">
-            <el-select v-model="addForm.coach" filterable placeholder="请选择"  size="mini">
+          <el-form-item label="教练" prop="coachId">
+            <el-select v-model="addForm.coachId" filterable placeholder="请选择"  size="mini">
               <el-option
                 :remote-method="getCoaches"
                 v-for="item in coaches"
@@ -27,8 +27,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="场地" prop="venue">
-            <el-select v-model="addForm.venue" filterable placeholder="请选择"  size="mini">
+          <el-form-item label="场地" prop="venueId">
+            <el-select v-model="addForm.venueId" filterable placeholder="请选择"  size="mini">
               <el-option
                 :remote-method="getVenues"
                 v-for="item in venues"
@@ -38,16 +38,17 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="教学日期" prop="date">
-            <el-date-picker type="dates" placeholder="选择一个或多个日期" v-model="addForm.dates"  size="mini" class="input-class"></el-date-picker>
+          <el-form-item label="教学日期" prop="trainDate">
+            <el-date-picker type="dates" placeholder="选择一个或多个日期" v-model="addForm.trainDates"  size="mini" class="input-class"></el-date-picker>
           </el-form-item>
           <el-form-item label="教学时间">
             <el-time-picker
               is-range
               size="mini"
               clear-icon
+              :picker-options="{selectableRange: '08:00:00 - 20:00:00'}"
               value-format="HH:mm"
-              v-model="addForm.timeSpan"
+              v-model="addForm.trainTimeSpan"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -92,12 +93,12 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="false" width="60%">
+    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="false" width="70%">
       <el-row :gutter="20">
         <el-col :span="8"><div class="grid-content bg-purple"></div>
           <el-form :model="detailForm" label-width="80px"  ref="detailForm">
             <el-form-item label="教学日期">
-              <el-date-picker type="date"  v-model="detailForm.date" :disabled="true" ></el-date-picker>
+              <el-date-picker type="date"  v-model="detailForm.trainDate" :disabled="true" ></el-date-picker>
             </el-form-item>
             <el-form-item label="教学时间">
             <el-time-picker
@@ -105,7 +106,7 @@
               :disabled="true"
               clear-icon
               value-format="HH:mm"
-              v-model="detailForm.timeSpan"
+              v-model="detailForm.trainTimeSpan"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -116,8 +117,8 @@
             <el-form-item label="课程名称" >
               <el-input v-model="detailForm.courseName" auto-complete="off" :disabled="true"></el-input>
             </el-form-item>
-            <el-form-item label="教练" prop="coach">
-              <el-select v-model="detailForm.coach" filterable placeholder="请选择">
+            <el-form-item label="教练" prop="coachId">
+              <el-select v-model="detailForm.coachId" filterable placeholder="请选择">
                 <el-option
                   :remote-method="getCoaches"
                   v-for="item in coaches"
@@ -127,8 +128,8 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="场地" prop="venue">
-              <el-select v-model="detailForm.venue" filterable placeholder="请选择">
+            <el-form-item label="场地" prop="venueId">
+              <el-select v-model="detailForm.venueId" filterable placeholder="请选择">
                 <el-option
                   :remote-method="getVenues"
                   v-for="item in venues"
@@ -173,7 +174,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getCourseList, getCoachList, getVenueList,getCourseStudents } from './api';
+  import { getCourseList, getCoachList, getVenueList,getCourseStudents,addSchedule,batchAddSchedule } from './api';
 
   export default {
     data() {
@@ -194,10 +195,10 @@
           courseId: [
             { required: true, message: '请选择课程名称', trigger: 'blur' }
           ],
-          coach: [
+          coachId: [
             { required: true, message: '请选择教练', trigger: 'blur' }
           ],
-          venue: [
+          venueId: [
             { required: true, message: '请选择场地', trigger: 'blur' }
           ]
           
@@ -205,21 +206,23 @@
         //新增界面数据
         addForm: {
           courseId: '',
-          coach: '',
-          venue: '',
-          dates: [],
-          timeSpan:'',
+          coachId: '',
+          venueId: '',
+          trainDates: [],
+          trainTimeSpan:'',
+          students: []
         },
         detailFormVisible: false,
         detailForm:{
           courseId: '',
           courseName: '',
-          coach: '',
-          venue: '',
-          date: '',
-          timeSpan: '',
+          coachId: '',
+          venueId: '',
+          trainDate: '',
+          trainTimeSpan: '',
           students: []
-        }
+        },
+        schedules:[]
       }
     },
     methods: {
@@ -270,7 +273,6 @@
         getCourseStudents(para).then((res) => {
           if( res && res.data){
             this.students = res.data;
-            debugger;
             setTimeout(() => {
               this.students.forEach(item => {
                 this.$refs.studentTable.toggleRowSelection(item,true);
@@ -282,32 +284,39 @@
         });
       },
       appendSchedule(){//追加排班
-        for(let i=0;i<this.addForm.dates.length;i++){
+        for(let i=0;i<this.addForm.trainDates.length;i++){
           let event={
             title:this.getCouserName(this.addForm.courseId),
-            start:this.addForm.dates[i],
-            end:this.addForm.dates[i],
+            start:this.addForm.trainDates[i],
+            end:this.addForm.trainDates[i],
             cssClass : ['home', 'work']
           };
-          let DATA ={
+          let schedule ={
             courseId:this.addForm.courseId,
             courseName:this.getCouserName(this.addForm.courseId),
-            date : formatDate(this.addForm.dates[i],'yyyy-MM-dd'),
-            venueId: this.addForm.venue,
-            venueName: this.getVenueName(this.addForm.venue),
-            coachId: this.addForm.coach,
-            coachName: this.getCoachName(this.addForm.coach),
+            trainDate : formatDate(this.addForm.trainDates[i],'yyyy-MM-dd'),
+            trainTimeSpan: this.addForm.trainTimeSpan,
+            venueId: this.addForm.venueId,
+            venueName: this.getVenueName(this.addForm.venueId),
+            coachId: this.addForm.coachId,
+            coachName: this.getCoachName(this.addForm.coachId),
             students: this.sels
           };
-          event.DATA=DATA;
-          this.calendarOptions.events.push(event);
-          this.changeStudentSections(this.sels,true);
+          //追加到缓存中,如果成功，才更新日历的显示
+          if(this.addOneDayScheduleCache(schedule)){
+            event.DATA=schedule;
+            this.calendarOptions.events.push(event);
+            this.changeStudentSections(this.sels,true);
+          }
         }
+        this.addForm.students=this.sels;
+
+       
 
       },
       removeSchedule(){//移除排班
-        for(let i=0;i<this.addForm.dates.length;i++){
-          var deletingDate=formatDate(this.addForm.dates[i],'yyyy-MM-dd');
+        for(let i=0;i<this.addForm.trainDates.length;i++){
+          var deletingDate=formatDate(this.addForm.trainDates[i],'yyyy-MM-dd');
           for(let j=0;j<this.calendarOptions.events.length;j++){
             var event=this.calendarOptions.events[j];
             var currentDate=formatDate(event.start,'yyyy-MM-dd');
@@ -320,6 +329,41 @@
             }
           }
         }
+      },
+      //往排班记录中追加一次排班
+      addOneDayScheduleCache:function(newSchedule){
+         debugger;
+        let match=false;//全匹配，即课程与日期都匹配
+        let halfMatch=false;//只有课程匹配
+        this.schedules.forEach(schedule =>{
+          if(schedule.courseId===newSchedule.courseId 
+            && formatDate(schedule.trainDate)===formatDate(newSchedule.trainDate)){//如果排班已存在,更新信息及学员记录
+            schedule.coachId=newSchedule.coachId;
+            schedule.coachName-newSchedule.coachName;
+            schedule.venueId=newSchedule.venueId;
+            schedule.venueName=newSchdule.venueName;
+            newSchedule.students.forEach(newStudent =>{
+              let isStudentExist=false;
+              schedule.students.forEach(student =>{
+                if(student.id==newStudent.id){
+                  isStudentExist=true;
+                  return;
+                }
+              });
+              if(!isStudentExist){//如果没有匹配上，说明是新学员，追加到已经排班记录的学员中
+                schedule.students.push(newStudent);
+              }
+            });
+            match=true;
+            return;
+          }
+        });
+        
+        if(!match){
+           this.schedules.push(newSchedule);
+           return true;
+        }
+        return false;
       },
       deleteOneDaySchedule (){
 
@@ -334,16 +378,16 @@
 
       },
       eventClick: function(event){
-        debugger;
+
         this.detailFormVisible = true;
         this.detailForm.courseId=event.DATA.courseId;
         this.detailForm.courseName=event.DATA.courseName;
         this.detailForm.coach=event.DATA.coachId;
         this.detailForm.venue=event.DATA.venueId;
-        this.detailForm.date=event.DATA.date;
-        this.detailForm.timeSpan=event.DATA.timeSpan;
+        this.detailForm.trainDate=event.DATA.trainDate;
+        this.detailForm.trainTimeSpan=event.DATA.trainTimeSpan;
         this.detailForm.students=event.DATA.students;
-        console.log(event);
+       
 
       },
       getCouserName: function(id) {
@@ -385,8 +429,9 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
               //NProgress.start();
-              let para = Object.assign({}, this.addForm);
-              addSchedule(para).then((res) => {
+              //let para = Object.assign({}, this.addForm);
+              let para = Object.assign([], this.schedules);
+              batchAddSchedule(para).then((res) => {
                 this.addLoading = false;
                 //NProgress.done();
                 this.$message({

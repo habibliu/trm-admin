@@ -271,29 +271,14 @@
         });
       },
       clearFormData() {
-        this.editForm = {
-          id: 0,
-          name: '',
-          phone: 0,
-          birthDate: '',
-          sex: '',
-          phone:'',
-          age:0,
-          school: '',
-          parentName: '',
-          parentPhone: '',
-          parentWX: '',
-          courseId:'',
-          grade:'',
-          phase:'',
-          price:'',
-          sections:'',
-          periods: 0,
-          totalFee: 0,
-          totalSections:0,
-          attachSections:0,
-          payoff: 1,
-          auto: 1
+        this.detailForm = {
+          courseId: '',
+          courseName: '',
+          coachId: '',
+          venueId: '',
+          trainDate: '',
+          trainTimeSpan: '',
+          students: []
         };
       },
       //显示编辑界面
@@ -348,7 +333,6 @@
               this.addLoading = true;
               //NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birthDateDate = (!para.birthDateDate || para.birthDateDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
 
               if(this.editForm.id !=null && this.editForm.id != ''){
                 editRegistration(para).then((res) => {

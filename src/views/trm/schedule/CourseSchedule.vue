@@ -66,7 +66,7 @@
           </el-table-column>
           <el-table-column prop="totalSections" label="课程节数" width="100">
           </el-table-column>
-          <el-table-column prop="arrangeedSections" label="已排期" width="100">
+          <el-table-column prop="arrangedSections" label="已排期" width="100">
           </el-table-column>
         </el-table>
 
@@ -307,10 +307,21 @@
             event.DATA=schedule;
             this.calendarOptions.events.push(event);
             this.changeStudentSections(this.sels,true);
+            //从班级的学员列表中追加已排班节数
+            this.students.forEach( item => {
+              debugger;
+              for(var i=0;i<this.addForm.students.length;i++){
+                if(item.id===this.addForm.schedule.students[i].id){
+                    item.arrangedSections++;
+                }
+              }
+            });
           }
+
+
         }
         this.addForm.students=this.sels;
-
+        
        
 
       },
@@ -322,7 +333,6 @@
             var currentDate=formatDate(event.start,'yyyy-MM-dd');
             if(currentDate==deletingDate){
               if (event.DATA.courseId==this.addForm.courseId){
-                debugger;
                 var event=this.calendarOptions.events.splice(j,1);
                 this.changeStudentSections(event.DATA.students,false);
               }
@@ -332,9 +342,7 @@
       },
       //往排班记录中追加一次排班
       addOneDayScheduleCache:function(newSchedule){
-         debugger;
         let match=false;//全匹配，即课程与日期都匹配
-        let halfMatch=false;//只有课程匹配
         this.schedules.forEach(schedule =>{
           if(schedule.courseId===newSchedule.courseId 
             && formatDate(schedule.trainDate)===formatDate(newSchedule.trainDate)){//如果排班已存在,更新信息及学员记录
@@ -342,6 +350,7 @@
             schedule.coachName-newSchedule.coachName;
             schedule.venueId=newSchedule.venueId;
             schedule.venueName=newSchdule.venueName;
+            debugger;
             newSchedule.students.forEach(newStudent =>{
               let isStudentExist=false;
               schedule.students.forEach(student =>{

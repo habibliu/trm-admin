@@ -1,6 +1,6 @@
 import axios from '@/common/js/AxiosPlugin'
 
 
-export const getShiftListPage = params => { 
-  return axios.get(`/Shift/listpage`, {params:{params:params}}).then(res => res.data);
+export const getShiftListPage = (params ,page) => { 
+  return axios.get(`/Shift/listPage`,{params:{'params':params,'page':page}}).then(res => res.data);
 };

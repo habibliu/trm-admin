@@ -23,10 +23,10 @@ import SportVenue from './views/master/venue/SportVenue.vue'
 import Course from './views/master/course/Course.vue'
 
 import CourseRegistration from './views/trm/coursereg/CourseRegistration.vue'
-import CoursePayment from './views/trm/payment/CoursePayment.vue'
 import CourseSchedule from './views/trm/schedule/CourseSchedule.vue'
 import Attendance from './views/trm/attendance/Attendance.vue'
 import RuleSetting from './views/trm/rules/RuleSetting.vue'
+import Shift from './views/trm/shift/Shift.vue'
 /*
 // 配置路由
 Vue.use(Router)
@@ -158,6 +158,7 @@ export default [
             { path: '/RuleSetting', component: RuleSetting, name: '赠送规则' },
             { path: '/CourseRegistration', component: CourseRegistration, name: '课程报名' },
             { path: '/CourseSchedule', component: CourseSchedule, name: '排期管理' },
+            { path: '/Shift', component: Shift, name: '排期结果管理' },
             { path: '/Attendance', component: Attendance, name: '考勤管理' }
         ]
     },

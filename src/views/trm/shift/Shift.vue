@@ -3,64 +3,40 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
       <el-form :inline="true" :model="filters">
-        <el-form-item label="课程名称">
+        <el-form-item label="学生名称">
           <el-input v-model="filters.studentName" placeholder="课程名称"></el-input>
         </el-form-item>
-        <el-form-item label="电话">
-          <el-input v-model="filters.phone" placeholder="电话"></el-input>
+        <el-form-item label="课程名称">
+          <el-input v-model="filters.courseName" placeholder="电话"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" v-on:click="getRegistrations">查询</el-button>
+          <el-button type="primary" v-on:click="getShifts">查询</el-button>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleAdd">新增</el-button>
-        </el-form-item>
+       
       </el-form>
     </el-col>
 
     <!--列表-->
-    <el-table :data="registrations" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+    <el-table :data="shifts" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
       <el-table-column type="selection" width="55">
       </el-table-column>
       <el-table-column type="index" width="60">
       </el-table-column>
-       <el-table-column prop="studentCode" label="学员编号" width="120" sortable>
+      <el-table-column prop="trainDate" label="训练日期" width="120" :formatter="formatTrainDate" sortable>
       </el-table-column>
-      <el-table-column prop="studentName" label="学员姓名" width="120" sortable>
+      <el-table-column prop="trainTime" label="训练时间" width="120"  sortable>
       </el-table-column>
-      <el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
+      <el-table-column prop="courseName" label="课程名称" width="200"  sortable>
       </el-table-column>
-      <el-table-column prop="birthDate" label="生日" width="100" :formatter="formatBirthDate" sortable>
+      <el-table-column prop="coachName" label="教练姓名" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="age" label="年龄" width="100" :formatter="formatAge"sortable>
+      <el-table-column prop="venueName" label="场地" width="200" sortable>
       </el-table-column>
-      <el-table-column prop="school" label="在读学校" width="180" sortable>
+       <el-table-column prop="studentCount" label="参加人数" width="120"  sortable>
       </el-table-column>
-      <el-table-column prop="phone" label="学员电话" width="140" sortable>
-      </el-table-column>
-      <el-table-column prop="registerDate" label="报名日期" width="120" :formatter="formatRegistDate" sortable>
-      </el-table-column>
-      <el-table-column prop="periods" label="报名期数" width="120" sortable>
-      </el-table-column>
-      <el-table-column prop="totalSections" label="总节数" width="120" sortable>
-      </el-table-column>
-      <el-table-column prop="courseName" label="课程名称" width="180" sortable>
-      </el-table-column>
-       <el-table-column prop="courseLevel" label="课程级别" width="120" :formatter="formatGrade" sortable>
-      </el-table-column>
-       <el-table-column prop="coursePhase" label="课程阶段" width="120" :formatter="formatPhase" sortable>
-      </el-table-column>
-      <el-table-column prop="totalFee" label="学费" width="120" sortable>
-      </el-table-column>
-      <el-table-column prop="payoff" label="是否已缴纳" width="120" :formatter="formatPayoff" sortable>
-      </el-table-column>
-      <el-table-column prop="paymentDate" label="缴费日期" width="120" :formatter="formatRegistDate" sortable>
-      </el-table-column>
-      
       <el-table-column label="操作" width="150" fixed="right">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button type="text" size="small" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
           <el-button type="text" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -75,150 +51,76 @@
     </el-col>
 
     <!--编辑界面-->
-    <el-dialog  :visible="editFormVisible" :close-on-click-modal="false" width="80%" ref="dialog">
-      <template slot-title="scope">
-        <span class="formTitle">{{formTitle}}</span>
-      </template>
-      <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-        <el-row :gutter="20">
-          <el-col :span="6"><div class="grid-content bg-purple"></div>
-            <el-form-item label="学员编号" prop="studentCode">
-              <el-input v-model="editForm.studentCode" auto-complete="off"></el-input>
+    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="false" width="70%">
+      <el-row :gutter="20">
+        <el-col :span="8"><div class="grid-content bg-purple"></div>
+          <el-form :model="detailForm" label-width="80px"  ref="detailForm">
+            <el-form-item label="教学日期">
+              <el-date-picker type="date"  v-model="detailForm.trainDate" :disabled="true" ></el-date-picker>
             </el-form-item>
-            <el-form-item label="学员姓名" prop="studentName">
-              <el-input v-model="editForm.studentName" auto-complete="off"></el-input>
+            <el-form-item label="教学时间">
+            <el-time-picker
+              is-range
+              :disabled="true"
+              clear-icon
+              value-format="HH:mm"
+              v-model="detailForm.trainTimeSpan"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              placeholder="选择时间范围"
+              class="input-class">
+            </el-time-picker>
+          </el-form-item>
+            <el-form-item label="课程名称" >
+              <el-input v-model="detailForm.courseName" auto-complete="off" :disabled="true"></el-input>
             </el-form-item>
-            <el-form-item label="性别">
-              <el-radio-group v-model="editForm.sex">
-                <el-radio class="radio" :label="1">男</el-radio>
-                <el-radio class="radio" :label="0">女</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item label="手机号" prop="phone">
-              <el-input v-model="editForm.phone" placeholder="学员手机号码"></el-input>
-            </el-form-item>
-            <el-form-item label="生日">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birthDate"  @change="birthDateChanged" class="input-class"></el-date-picker>
-            </el-form-item>
-            <el-form-item label="年龄">
-              <el-input-number v-model="editForm.age" :disabled=false></el-input-number>
-            </el-form-item>
-            <el-form-item label="身高">
-              <el-input-number v-model="editForm.height" ></el-input-number>
-            </el-form-item>
-            <el-form-item label="就读学校">
-              <el-select v-model="editForm.school" filterable allow-create default-first-option @change="createSchoolItem" placeholder="请选择">
+            <el-form-item label="教练" prop="coachId">
+              <el-select v-model="detailForm.coachId" filterable placeholder="请选择">
                 <el-option
-                  :remote-method="getSchools"
-                  :loading="loading"
-                  v-for="item in schools"
+                  :remote-method="getCoaches"
+                  v-for="item in coaches"
                   :key="item.id"
-                  :label="item.itemName"
-                  :value="item.itemCode">
-               </el-option>
-              </el-select>
-            </el-form-item>
-            
-          </el-col>
-          <el-col :span="6"><div class="grid-content bg-purple"></div>
-             <el-form-item label="注册日期">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.registerDate" class="input-class"></el-date-picker>
-            </el-form-item>
-            <el-form-item label="家长姓名" prop="parentName">
-              <el-input v-model="editForm.parentName" filterable placeholder="请输入家姓名" ></el-input>
-            </el-form-item>
-            <el-form-item label="性别">
-              <el-radio-group v-model="editForm.parentSex">
-                <el-radio class="radio" :label="1">男</el-radio>
-                <el-radio class="radio" :label="0">女</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item label="手机号" prop="parentPhone">
-              <el-input v-model="editForm.parentPhone" placeholder="家长手机号码"></el-input>
-            </el-form-item>
-            <el-form-item label="微信号">
-              <el-input v-model="editForm.parentWx" placeholder="家长微信号码"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6"><div class="grid-content bg-purple"></div>
-            <el-form-item label="课程名称" prop="courseId">
-            <el-select v-model="editForm.courseId" filterable placeholder="请选择" @change="setCourseDetail">
-              <el-option
-                :remote-method="getCourses"
-                v-for="item in courses"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                >
-              </el-option>
-            </el-select>
-            </el-form-item>
-            <el-form-item label="级别">
-              <el-select v-model="editForm.grade" placeholder="请选择" :disabled=true>
-                <el-option
-                v-for="item in courseGrades"
-                :key="item.id"
-                :label="item.itemName"
-                :value="item.itemCode"
-                >
-              </el-option>
-              </el-select>
-            </el-form-item>
-           <el-form-item label="阶段">
-              <el-select v-model="editForm.phase" placeholder="请选择" :disabled=true>
-                <el-option
-                v-for="item in coursePhases"
-                :key="item.id"
-                :label="item.itemName"
-                :value="item.itemCode"
-                >
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
-           
-             <el-form-item label="每期定价" >
-              <el-input v-model="editForm.price" :disabled=true></el-input>
+            <el-form-item label="场地" prop="venueId">
+              <el-select v-model="detailForm.venueId" filterable placeholder="请选择">
+                <el-option
+                  :remote-method="getVenues"
+                  v-for="item in venues"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="每期节数" >
-              <el-input v-model="editForm.sections" :disabled=true></el-input>
-            </el-form-item>
-            <el-form-item label="报名期数" >
-              <el-input-number v-model="editForm.periods" :min=1 size="small" @change="periodsChange"></el-input-number>
-            </el-form-item>
-            <el-form-item label="赠送节数">
-              <template slot-scope="scope">
-                <el-input-number v-model="editForm.attachSections"   size="small"
-                @change="attachSectionsChange">
-                </el-input-number>
-                <el-checkbox v-model="editForm.auto">自动</el-checkbox>
-              </template>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6"><div class="grid-content bg-purple"></div>
-            <el-form-item label="总金额" >
-              <el-input v-model="editForm.totalFee" :disabled=true></el-input>
-            </el-form-item>
-            <el-form-item label="总节数" >
-              <el-input v-model="editForm.totalSections" :disabled=true></el-input>
-            </el-form-item>
-            <el-form-item label="学费已缴" >
-              <el-checkbox v-model="editForm.payoff"></el-checkbox>
-            </el-form-item>
-            <el-form-item label="缴费日期" >
-              <el-date-picker v-model="editForm.paymentDate" type="date" class="input-class"></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="备注">
-          <el-input type="textarea" v-model="editForm.memo" rows="3"></el-input>
-        </el-form-item>
-      </el-form>
+          </el-form>
+        </el-col>
+        <el-col :span="16"><div class="grid-content bg-purple"></div>
+          <el-table :data="detailForm.students" highlight-current-row v-loading="listLoading" @selection-change="selsChange" >
+            <el-table-column type="selection" width="55">
+            </el-table-column>
+            <el-table-column type="index" width="60">
+            </el-table-column>
+            <el-table-column prop="name" label="学员姓名" width="120" sortable>
+            </el-table-column>
+            <el-table-column prop="totalSections" label="课程节数" width="120" sortable>
+            </el-table-column>
+            <el-table-column prop="arrangeSections" label="已排期" min-width="120" sortable>
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+      
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="editFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="handleSubmit" :loading="editLoading">提交</el-button>
+        <el-button @click.native="detailFormVisible = false">关闭</el-button>
+        <el-button type="primary" @click.native="updateOneDaySchedule" >更新</el-button>
+        <el-button type="danger" @click.native="deleteOneDaySchedule" >删除</el-button>
       </div>
     </el-dialog>
-    
   </section>
 </template>
 
@@ -232,50 +134,27 @@
       return {
         filters: {//过滤条件
           studentName: '',
-          phone: ''
+          courseName: ''
         },
-        registrations: [],
         courses: [],
-        courseGrades: [],//课程等级
-        coursePhases: [],//课程阶段
-        schools:[],
+        coaches: [],
+        venues: [],
+        students: [],
+        shifts: [],
         total: 0,
         page: 1,
         listLoading: false,
         sels: [],//列表选中列
-        formTitle:'',
-        editFormVisible: false,//编辑界面是否显示
-        editLoading: false,
-        editFormRules: {
-          name: [
-            { required: true, message: '请输入课程名称', trigger: 'blur' }
-          ]
-        },
+        detailFormVisible: false,//编辑界面是否显示
         //编辑界面数据
-        editForm: {
-          id: 0,
-          studentCode:'',
-          studentName: '',
-          phone: 0,
-          birthDate: '',
-          sex: '',
-          phone:'',
-          age:0,
-          school: '',
-          parentName: '',
-          parentPhone: '',
-          parentWX: '',
-          courseId:'',
-          grade:'',
-          phase:'',
-          price:'',
-          sections:'',
-          periods: 0,
-          totalFee: 0,
-          totalSections:0,
-          attachSections:0,
-          payoff: 1,
-          auto: 1
+        detailForm:{
+          courseId: '',
+          courseName: '',
+          coachId: '',
+          venueId: '',
+          trainDate: '',
+          trainTimeSpan: '',
+          students: []
         }
 
       }
@@ -304,15 +183,10 @@
         }
         return row.coursePhase;
       },
-      formatBirthDate: function(row,column){
-        return  formatDate(row.birthDate,"yyyy-MM-dd");
+      formatTrainDate: function(row,column){
+        return  formatDate(row.trainDate,"yyyy-MM-dd");
       },
-      formatAge:function(row,column){
-        return calAge(row.birthDate);
-      },
-      formatRegistDate:function(row,column){
-        return  formatDate(row.registerDate,"yyyy-MM-dd");
-      },
+     
       handleCurrentChange(val) {
         this.page = val;
         this.getRegistrations();
@@ -328,18 +202,18 @@
       attachSectionsChange:function(value){
         this.editForm.totalSections =  this.editForm.sections * this.editForm.periods + value;
       },
-      //获取学员注册列表
-      getRegistrations() {
+      //获取排班列表
+      getShifts() {
         let para = {
           studentName: this.filters.studentName,
-          phone: this.filters.phone
+          courseName: this.filters.courseName
         };
         let page={ 'currentPage': this.page,'pageSize':10};
         this.listLoading = true;
-        getRegistrationListPage(para,page).then((res) => {
+        getShiftListPage(para,page).then((res) => {
           if( res && res.data){
             this.total = res.data.total;
-            this.registrations = res.data.rows;
+            this.shifts = res.data.rows;
           }
           this.listLoading = false;
         }).catch((error) => {
@@ -351,8 +225,9 @@
         let para = {
           typeCode: 'SCHOOL',
         };
+        let page={ 'currentPage': this.page,'pageSize':10};
         this.loading  = true;
-        getDictionaryList(para).then((res) => {
+        getDictionaryList(para,page).then((res) => {
           if( res && res.data){
             this.schools = res.data;
           }
@@ -370,54 +245,6 @@
         addSchool(dict).then((res) => {
           console.log(res.dat);
           this.shools.push(res.data)
-        }).catch((error) => {
-          console.log(error);
-        });
-      },
-      getCourses(){//获取课程列表
-        let para = {
-          name: '',
-        };
-        getCourseList(para).then((res) => {
-          if( res && res.data){
-            this.courses = res.data;
-          }
-        }).catch((error) => {
-          console.log(error);
-        });
-      },
-      setCourseDetail(){
-        for(var i = 0,len=this.courses.length; i < len; i++) {
-          if(this.courses[i].id==this.editForm.courseId){
-            this.editForm.grade = this.courses[i].level;
-            this.editForm.phase = this.courses[i].phase;
-            this.editForm.price = this.courses[i].pricePerTerm;
-            this.editForm.sections =this.courses[i].numberPerTerm;
-            this.editForm.totalFee = this.courses[i].pricePerTerm * this.editForm.periods;
-            this.editForm.totalSections =  this.courses[i].numberPerTerm + this.editForm.attachSections;
-          }
-        }
-      },
-      getCourseGrades(){
-        let para = {
-          typeCode: 'COURSE-GRADE',
-        };
-        getDictionaryList(para).then((res) => {
-          if( res && res.data){
-            this.courseGrades = res.data;
-          }
-        }).catch((error) => {
-          console.log(error);
-        });
-      },
-      getCoursePhases(){
-        let para = {
-          typeCode: 'COURSE-PHASE',
-        };
-        getDictionaryList(para).then((res) => {
-          if( res && res.data){
-            this.coursePhases = res.data;
-          }
         }).catch((error) => {
           console.log(error);
         });
@@ -581,11 +408,8 @@
       }
     },
     mounted() {//默认页面加截方法
-      this.getRegistrations();
-      this.getSchools();
-      this.getCourses();
-      this.getCourseGrades();
-      this.getCoursePhases();
+      this.getShifts();
+
     }
   }
 

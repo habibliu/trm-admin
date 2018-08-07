@@ -14,8 +14,8 @@ const Axios = axios.create({
 // 添加请求拦截器
 Axios.defaults.headers['Cache-Control'] = 'no-cache'
 Axios.defaults.headers['Pragma'] = 'no-cache'
-Axios.defaults.baseURL="http://139.159.214.95:8100"
-//Axios.defaults.baseURL = process.env.API_URL
+//Axios.defaults.baseURL="http://139.159.214.95:8100"
+Axios.defaults.baseURL = process.env.API_URL
 //Console.log('Axios.defaults.baseURL:'+Axios.defaults.baseURL);
 //Axios.defaults.withCredentials=true
 Axios.interceptors.request.use(config => {

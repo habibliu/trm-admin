@@ -64,7 +64,7 @@
               :disabled="true"
               clear-icon
               value-format="HH:mm"
-              v-model="detailForm.trainTimeSpan"
+              v-model="detailForm.trainTime"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -78,7 +78,6 @@
             <el-form-item label="教练" prop="coachId">
               <el-select v-model="detailForm.coachId" filterable placeholder="请选择">
                 <el-option
-                  :remote-method="getCoaches"
                   v-for="item in coaches"
                   :key="item.id"
                   :label="item.name"
@@ -89,7 +88,6 @@
             <el-form-item label="场地" prop="venueId">
               <el-select v-model="detailForm.venueId" filterable placeholder="请选择">
                 <el-option
-                  :remote-method="getVenues"
                   v-for="item in venues"
                   :key="item.id"
                   :label="item.name"
@@ -127,7 +125,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getShiftListPage} from './api';
+  import { getShiftListPage,getCoachList,getVenueList,getShifStudents} from './api';
 
   export default {
     data() {
@@ -153,7 +151,7 @@
           coachId: '',
           venueId: '',
           trainDate: '',
-          trainTimeSpan: '',
+          trainTime: '',
           students: []
         }
 
@@ -201,6 +199,28 @@
       },
       attachSectionsChange:function(value){
         this.editForm.totalSections =  this.editForm.sections * this.editForm.periods + value;
+      },
+      getCoaches(){//获取教练列表
+        let para = {
+        };
+        getCoachList(para).then((res) => {
+          if( res && res.data){
+            this.coaches = res.data;
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+      },
+      getVenues(){//获取场地列表
+        let para = {
+        };
+        getVenueList(para).then((res) => {
+          if( res && res.data){
+            this.venues = res.data;
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
       },
       //获取排班列表
       getShifts() {
@@ -283,21 +303,14 @@
       },
       //显示编辑界面
       handleEdit: function (index, row) {
-        this.formTitle = '编辑';
-        this.editFormVisible = true;
+        this.detailFormVisible = true;
         this.clearFormData();
-        this.editForm = Object.assign({}, row);
-        var  age=calAge(this.editForm.birthDate);
-        this.editForm.age=age;
+        this.detailForm = Object.assign({}, row);
+        //this.detialForm.trainTimeSpan=row.trainTime;
       },
       //显示新增界面
       handleAdd: function () {
         this.formTitle = '新增';
-        this.editFormVisible = true;
-        this.clearFormData();
-      },
-      handleAudit: function(){
-        this.formTitle = '审核';
         this.editFormVisible = true;
         this.clearFormData();
       },
@@ -393,7 +406,8 @@
     },
     mounted() {//默认页面加截方法
       this.getShifts();
-
+      this.getCoaches();
+      this.getVenues();
     }
   }
 

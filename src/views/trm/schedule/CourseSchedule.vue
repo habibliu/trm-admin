@@ -107,6 +107,11 @@
               clear-icon
               value-format="HH:mm"
               v-model="detailForm.trainTimeSpan"
+              :picker-options="{
+                start: '08:00',
+                step: '00:30',
+                end: '21:00'
+              }">
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"

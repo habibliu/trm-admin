@@ -107,11 +107,6 @@
               clear-icon
               value-format="HH:mm"
               v-model="detailForm.trainTimeSpan"
-              :picker-options="{
-                start: '08:00',
-                step: '00:30',
-                end: '21:00'
-              }">
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -179,7 +174,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getCourseList, getCoachList, getVenueList,getCourseStudents,addSchedule,batchAddSchedule } from './api';
+  import { getCourseList, getCoachList, getVenueList,getCourseStudents,addSchedule,batchAddSchedule,batchDeleteShift } from './api';
 
   export default {
     data() {
@@ -240,7 +235,6 @@
           name: '',
         };
         getCourseList(para).then((res) => {
-          debugger;
           if( res && res.data){
             this.courses = res.data;
           }
@@ -314,7 +308,6 @@
             this.changeStudentSections(this.sels,true);
             //从班级的学员列表中追加已排班节数
             this.students.forEach( item => {
-              debugger;
               for(var i=0;i<this.addForm.students.length;i++){
                 if(item.id===this.addForm.schedule.students[i].id){
                     item.arrangedSections++;

@@ -32,12 +32,21 @@
       </el-table-column>
       <el-table-column prop="venueName" label="场地" width="200" sortable>
       </el-table-column>
-       <el-table-column prop="studentCount" label="参加人数" width="120"  sortable>
+      <el-table-column prop="studentCount" label="参加人数" width="120"  sortable>
+      </el-table-column>
+      <el-table-column label="考勤结果">
+        <el-table-column prop="actualCount" label="实到人数" width="120"  sortable>
+        </el-table-column>
+        <el-table-column prop="leaveCount" label="请假人数" width="120"  sortable>
+        </el-table-column>
+        <el-table-column prop="absentCount" label="旷课人数" width="120"  sortable>
+        </el-table-column>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button type="text" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+          <el-button type="text" size="small" @click="handleAttendance(scope.$index, scope.row)">考勤</el-button>
         </template>
       </el-table-column>
 
@@ -51,9 +60,9 @@
     </el-col>
 
     <!--编辑界面-->
-    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="false" width="70%">
+    <el-dialog title="详情" :visible.sync="detailFormVisible" :close-on-click-modal="true" width="70%">
       <el-row :gutter="20">
-        <el-col :span="8"><div class="grid-content bg-purple"></div>
+        <el-col :span="10"><div class="grid-content bg-purple"></div>
           <el-form :model="detailForm" label-width="80px"  ref="detailForm">
             <el-form-item label="教学日期">
               <el-date-picker type="date"  v-model="detailForm.trainDate" :disabled="true" ></el-date-picker>
@@ -66,14 +75,11 @@
               value-format="HH:mm"
               v-model="detailForm.trainTime"
               range-separator="至"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-              placeholder="选择时间范围"
               class="input-class">
             </el-time-picker>
           </el-form-item>
             <el-form-item label="课程名称" >
-              <el-input v-model="detailForm.courseName" auto-complete="off" :disabled="true"></el-input>
+              <el-input v-model="detailForm.courseName" auto-complete="off" :disabled="true" class="input-class"></el-input>
             </el-form-item>
             <el-form-item label="教练" prop="coachId">
               <el-select v-model="detailForm.coachId" filterable placeholder="请选择">
@@ -97,26 +103,105 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col :span="16"><div class="grid-content bg-purple"></div>
+        <el-col :span="14"><div class="grid-content bg-purple"></div>
           <el-table :data="detailForm.students" highlight-current-row v-loading="listLoading" @selection-change="selsChange" >
             <el-table-column type="selection" width="55">
             </el-table-column>
             <el-table-column type="index" width="60">
             </el-table-column>
-            <el-table-column prop="name" label="学员姓名" width="120" sortable>
+            <el-table-column prop="studentName" label="学员姓名" width="120" sortable>
             </el-table-column>
             <el-table-column prop="totalSections" label="课程节数" width="120" sortable>
             </el-table-column>
-            <el-table-column prop="arrangeSections" label="已排期" min-width="120" sortable>
+            <el-table-column prop="arrangedSections" label="已排期" min-width="120" sortable>
             </el-table-column>
+            <el-table-column label="操作" width="150" fixed="right">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="handleDelStudent(scope.$index, scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
           </el-table>
         </el-col>
       </el-row>
       
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="detailFormVisible = false">关闭</el-button>
-        <el-button type="primary" @click.native="updateOneDaySchedule" >更新</el-button>
-        <el-button type="danger" @click.native="deleteOneDaySchedule" >删除</el-button>
+        <el-button type="primary" @click.native="editSubmit" >更新</el-button>
+      </div>
+    </el-dialog>
+
+    <!--编辑界面-->
+    <el-dialog title="考勤" :visible.sync="attendanceFormVisible" :close-on-click-modal="true" width="50%">
+      <el-row :gutter="20">
+        <el-col :span="12"><div class="grid-content bg-purple"></div>
+          <el-form :model="attendanceForm" label-width="80px"  ref="attendanceForm">
+            <el-form-item label="教学日期">
+              <el-date-picker type="date"  v-model="attendanceForm.trainDate" :disabled="true" ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="教学时间">
+            <el-time-picker
+              is-range
+              :disabled="true"
+              clear-icon
+              value-format="HH:mm"
+              v-model="attendanceForm.trainTime"
+              range-separator="至"
+              class="input-class">
+            </el-time-picker>
+          </el-form-item>
+            <el-form-item label="课程名称" >
+              <el-input v-model="attendanceForm.courseName" auto-complete="off" :disabled="true" class="input-class"></el-input>
+            </el-form-item>
+            <el-form-item label="教练" prop="coachId">
+              <el-select v-model="attendanceForm.coachId" filterable placeholder="请选择">
+                <el-option
+                  v-for="item in coaches"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="场地" prop="venueId">
+              <el-select v-model="attendanceForm.venueId" filterable placeholder="请选择">
+                <el-option
+                  v-for="item in venues"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col :span="12"><div class="grid-content bg-purple"></div>
+          <el-table :data="attendanceForm.students" highlight-current-row v-loading="listLoading" @selection-change="selsChange" >
+            <el-table-column type="selection" width="55">
+            </el-table-column>
+            <el-table-column type="index" width="60">
+            </el-table-column>
+            <el-table-column prop="studentName" label="学员姓名" width="120" sortable>
+            </el-table-column>
+            <el-table-column label="考勤结果" width="120" sortable>
+              <template slot-scope="scope">
+                <el-select v-model="checkingIn"  placeholder="请选择">
+                  <el-option
+                    v-for="item in attendanceTypes"
+                    :key="item.id"
+                    :label="item.itemName"
+                    :value="item.itemCode">
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+              
+          </el-table>
+        </el-col>
+      </el-row>
+      
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="attendanceFormVisible = false">关闭</el-button>
+        <el-button type="primary" @click.native="attendanceSubmit" >更新</el-button>
       </div>
     </el-dialog>
   </section>
@@ -125,7 +210,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getShiftListPage,getCoachList,getVenueList,getShifStudents} from './api';
+  import { getShiftListPage,getCoachList,getVenueList,deleteShift,batchDeleteShifts,getAttendanceTypes,getShiftStudents,updateAttendance,updateShift} from './api';
 
   export default {
     data() {
@@ -153,8 +238,18 @@
           trainDate: '',
           trainTime: '',
           students: []
-        }
-
+        },
+        attendanceFormVisible:false,
+        attendanceForm:{
+          courseId: '',
+          courseName: '',
+          coachId: '',
+          venueId: '',
+          trainDate: '',
+          trainTime: '',
+          students: []
+        },
+        attendanceTypes:[]//出勤类型
       }
     },
     methods: {
@@ -188,17 +283,6 @@
       handleCurrentChange(val) {
         this.page = val;
         this.getRegistrations();
-      },
-      birthDateChanged:function(val){
-        var  age=calAge(val.getTime());
-        this.editForm.age=age;
-      },
-      periodsChange:function(value){
-        this.editForm.totalFee=this.editForm.price * value;
-        this.editForm.totalSections =  this.editForm.sections * value + this.editForm.attachSections;
-      },
-      attachSectionsChange:function(value){
-        this.editForm.totalSections =  this.editForm.sections * this.editForm.periods + value;
       },
       getCoaches(){//获取教练列表
         let para = {
@@ -259,7 +343,7 @@
       },
       createSchoolItem(){
         let dict={};
-        dict.itemName=this.editForm.school;
+        dict.itemName=this.detailForm.school;
         dict.typeCode='SCHOOL';
         dict.typeName='学校';
         addSchool(dict).then((res) => {
@@ -277,18 +361,23 @@
           this.listLoading = true;
           //NProgress.start();
           let para = { id: row.id };
-          removeRegistration(para).then((res) => {
+          deleteShift(para).then((res) => {
             this.listLoading = false;
             //NProgress.done();
             this.$message({
               message: '删除成功',
               type: 'success'
             });
-            this.getRegistrations();
+            this.getShifts();
           });
         }).catch(() => {
           this.listLoading = false;
         });
+      },
+      //删除学员
+      handleDelStudent: function(index,row){
+        
+        this.detailForm.students.splice(index,1);
       },
       clearFormData() {
         this.detailForm = {
@@ -301,82 +390,125 @@
           students: []
         };
       },
+      getShiftStudents(shiftId,type){
+        let para = {
+          id: shiftId,
+        };
+        
+        this.loading  = true;
+        getShiftStudents(para).then((res) => {
+          if( res && res.data){
+            if(type==='EDIT'){
+              this.detailForm.students = res.data;
+            }else{
+              this.attendanceForm.students = res.data;
+            }
+            
+          }
+          this.loading  = false;
+        }).catch((error) => {
+          this.loading  = false;
+          console.log(error);
+        });
+      },
+      getAttendanceTypes(){
+        let para = {
+          typeCode: 'ATTENDANCE-TYPE',
+        };
+        getAttendanceTypes(para).then((res) => {
+          if( res && res.data){
+            this.attendanceTypes = res.data;
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+      },
+      turnTimeSpanToArray:function(date,timeSpan){
+        
+        var times=timeSpan.substring(1, timeSpan.length-1).split(',');
+        var returnTimes=[];
+      
+        for(var i=0;i<2;i++){
+          var hourMinute=times[i].split(':');
+          var tempDate= new Date(date);
+          tempDate.setHours(parseInt(hourMinute[0]),parseInt(hourMinute[1]));
+          returnTimes.push(tempDate);
+        }
+        return returnTimes;
+      },
       //显示编辑界面
       handleEdit: function (index, row) {
         this.detailFormVisible = true;
         this.clearFormData();
         this.detailForm = Object.assign({}, row);
-        //this.detialForm.trainTimeSpan=row.trainTime;
+        this.detailForm.trainTime=this.turnTimeSpanToArray(row.trainDate,row.trainTime);
+        //取排班学生
+        this.getShiftStudents(row.id,'EDIT');
       },
-      //显示新增界面
-      handleAdd: function () {
-        this.formTitle = '新增';
-        this.editFormVisible = true;
+      //显示考勤页面
+      handleAttendance: function(index,row){
+        this.attendanceFormVisible = true;
         this.clearFormData();
+        this.attendanceForm = Object.assign({}, row);
+        this.attendanceForm.trainTime=this.turnTimeSpanToArray(row.trainDate,row.trainTime);
+        //取排班学生
+        this.getShiftStudents(row.id,'ATTENDANCE');
       },
+    
       //编辑
       editSubmit: function () {
-        this.$refs.editForm.validate((valid) => {
+        this.$refs.detailForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.editLoading = true;
               //NProgress.start();
-              let para = Object.assign({}, this.editForm);
-              para.birthDate = (!para.birthDate || para.birthDate == '') ? '' : formatDate(new Date(para.birthDate), 'yyyy-MM-dd');
-              editRegistration(para).then((res) => {
+              //不传递trainTime到后台
+              this.detailForm.trainTime='';
+              let para = Object.assign({}, this.detailForm);
+              debugger;
+              updateShift(para).then((res) => {
                 this.editLoading = false;
                 //NProgress.done();
                 this.$message({
                   message: '提交成功',
                   type: 'success'
                 });
-                this.$refs['editForm'].resetFields();
-                this.editFormVisible = false;
-                this.getRegistrations();
+                this.$refs['detailForm'].resetFields();
+                this.detailFormVisible = false;
+                this.getShifts();
               });
             });
           }
         });
       },
-      //新增/更新
-      handleSubmit: function () {
-        this.$refs.editForm.validate((valid) => {
+      //新增
+      attendanceSubmit: function () {
+        this.$refs.attendanceForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.editForm);
-
-              if(this.editForm.id !=null && this.editForm.id != ''){
-                editRegistration(para).then((res) => {
-                  this.addLoading = false;
-                  //NProgress.done();
-                  this.$message({
+              //不传递trainTime到后台
+              this.attendanceForm.trainTime='';
+              let para = Object.assign({}, this.attendanceForm);
+              updateAttendance(para).then((res) => {
+                this.addLoading = false;
+                this.$message({
                     message: '提交成功',
                     type: 'success'
-                  });
-                  this.$refs['editForm'].resetFields();
-                  this.editFormVisible = false;
-                  this.getRegistrations();
                 });
-              }else{
-                addRegistration(para).then((res) => {
-                  this.addLoading = false;
-                  //NProgress.done();
-                  this.$message({
-                    message: '提交成功',
-                    type: 'success'
-                  });
-                  this.$refs['editForm'].resetFields();
-                  this.editFormVisible = false;
-                  this.getRegistrations();
-                });
-              }
+                this.$refs['attendanceForm'].resetFields();
+                this.attendanceFormVisible = false;
+                this.getShifts();
+              });
+             
               
             });
           }
         });
       },
+  
+  
+  
       selsChange: function (sels) {
         this.sels = sels;
       },
@@ -389,7 +521,7 @@
           this.listLoading = true;
           //NProgress.start();
           let para = { ids: ids };
-          batchRemoveRegistration(para).then((res) => {
+          batchDeleteShift(para).then((res) => {
             
             //NProgress.done();
             this.$message({
@@ -408,6 +540,7 @@
       this.getShifts();
       this.getCoaches();
       this.getVenues();
+      this.getAttendanceTypes();
     }
   }
 

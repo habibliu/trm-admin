@@ -35,7 +35,7 @@
       <el-table-column prop="studentCount" label="参加人数" width="120"  sortable>
       </el-table-column>
       <el-table-column label="考勤结果">
-        <el-table-column prop="actualCount" label="实到人数" width="120"  sortable>
+        <el-table-column prop="normalCount" label="实到人数" width="120"  sortable>
         </el-table-column>
         <el-table-column prop="leaveCount" label="请假人数" width="120"  sortable>
         </el-table-column>
@@ -184,7 +184,7 @@
             </el-table-column>
             <el-table-column label="考勤结果" width="120" sortable>
               <template slot-scope="scope">
-                <el-select v-model="checkingIn"  placeholder="请选择">
+                <el-select v-model="checkingIn"  placeholder="请选择" @change="checkingInChange(scope.$index,scope.row, $event)" >
                   <el-option
                     v-for="item in attendanceTypes"
                     :key="item.id"
@@ -257,29 +257,19 @@
       formatSex: function (row, column) {
         return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
       },
-      formatPayoff: function (row, column) {
-        return row.payoff == 1 ? '已付' : row.payoff == 0 ? '未付' : '未付';
-      },
-      formatGrade: function (row, column) {
-        for(var i = 0,len=this.courseGrades.length; i < len; i++) {
-          if(this.courseGrades[i].itemCode==row.courseLevel){
-            return this.courseGrades[i].itemName;
-          }
-        }
-        return row.courseLevel
-      },
-      formatPhase: function (row, column){
-        for(var i = 0,len=this.coursePhases.length; i < len; i++) {
-          if(this.coursePhases[i].itemCode==row.coursePhase){
-            return this.coursePhases[i].itemName;
-          }
-        }
-        return row.coursePhase;
-      },
+      
       formatTrainDate: function(row,column){
         return  formatDate(row.trainDate,"yyyy-MM-dd");
       },
-     
+      checkingInChange:function(index,row,event){
+        row.checkingIn=event;
+        this.attendanceForm.students.forEach(student =>{
+          if(student.id==row.id){
+            student.checkingIn=event;
+            return;
+          }
+        });
+      },
       handleCurrentChange(val) {
         this.page = val;
         this.getRegistrations();

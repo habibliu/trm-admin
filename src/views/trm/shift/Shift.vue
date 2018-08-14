@@ -262,6 +262,8 @@
         return  formatDate(row.trainDate,"yyyy-MM-dd");
       },
       checkingInChange:function(index,row,event){
+        
+        /*
         row.checkingIn=event;
         this.attendanceForm.students.forEach(student =>{
           if(student.id==row.id){
@@ -269,10 +271,11 @@
             return;
           }
         });
+        */
       },
       handleCurrentChange(val) {
         this.page = val;
-        this.getRegistrations();
+        this.getShifts();
       },
       getCoaches(){//获取教练列表
         let para = {
@@ -391,7 +394,14 @@
             if(type==='EDIT'){
               this.detailForm.students = res.data;
             }else{
+              res.data.forEach(item=>{
+                debugger;
+                if(!item.checkingIn){
+                  item.checkingIn='NORMAL';
+                }
+              });
               this.attendanceForm.students = res.data;
+
             }
             
           }

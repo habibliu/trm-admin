@@ -131,7 +131,7 @@
     </el-dialog>
 
     <!--编辑界面-->
-    <el-dialog title="考勤" :visible.sync="attendanceFormVisible" :close-on-click-modal="true" width="50%">
+    <el-dialog title="考勤" :visible.aync="attendanceFormVisible" :close-on-click-modal="true" width="70%">
       <el-row :gutter="20">
         <el-col :span="12"><div class="grid-content bg-purple"></div>
           <el-form :model="attendanceForm" label-width="80px"  ref="attendanceForm">
@@ -175,23 +175,20 @@
           </el-form>
         </el-col>
         <el-col :span="12"><div class="grid-content bg-purple"></div>
-          <el-table :data="attendanceForm.students" highlight-current-row v-loading="listLoading" @selection-change="selsChange" >
+          <el-table :data="attendanceForm.students" highlight-current-row v-loading="listLoading" >
             <el-table-column type="selection" width="55">
             </el-table-column>
             <el-table-column type="index" width="60">
             </el-table-column>
             <el-table-column prop="studentName" label="学员姓名" width="120" sortable>
             </el-table-column>
-            <el-table-column label="考勤结果" width="120" sortable>
-              <template slot-scope="scope">
-                <el-select v-model="checkingIn"  placeholder="请选择" @change="checkingInChange(scope.$index,scope.row, $event)" >
-                  <el-option
-                    v-for="item in attendanceTypes"
-                    :key="item.id"
-                    :label="item.itemName"
-                    :value="item.itemCode">
-                  </el-option>
-                </el-select>
+            <el-table-column label="考勤结果" prop="checkingIn" width="260" sortable>
+              <template slot-scope="scope" >
+                <el-radio-group v-model="scope.row.checkingIn" >
+                  <el-radio-button label="NORMAL">正常</el-radio-button>
+                  <el-radio-button label="LEAVE">请假</el-radio-button>
+                  <el-radio-button label="ABSENT">旷课</el-radio-button>
+                </el-radio-group>
               </template>
             </el-table-column>
               
@@ -210,7 +207,7 @@
 <script>
   import {formatDate,calAge} from '@/common/js/util'
   //import NProgress from 'nprogress'
-  import { getShiftListPage,getCoachList,getVenueList,deleteShift,batchDeleteShifts,getAttendanceTypes,getShiftStudents,updateAttendance,updateShift} from './api';
+  import { getShiftListPage,getCoachList,getVenueList,deleteShift,batchDeleteShifts,getDictionaryList,getShiftStudents,updateAttendance,updateShift} from './api';
 
   export default {
     data() {
@@ -228,6 +225,7 @@
         page: 1,
         listLoading: false,
         sels: [],//列表选中列
+        attendanceStudentSels:[],
         detailFormVisible: false,//编辑界面是否显示
         //编辑界面数据
         detailForm:{
@@ -247,9 +245,10 @@
           venueId: '',
           trainDate: '',
           trainTime: '',
-          students: []
+          students:[]
         },
-        attendanceTypes:[]//出勤类型
+        attendanceTypes:[],//出勤类型
+        //attendanceStudents:[]
       }
     },
     methods: {
@@ -263,15 +262,11 @@
       },
       checkingInChange:function(index,row,event){
         
-        /*
-        row.checkingIn=event;
-        this.attendanceForm.students.forEach(student =>{
-          if(student.id==row.id){
-            student.checkingIn=event;
-            return;
-          }
+        //row.checkingIn=event;
+        this.attendanceStudents.forEach(student =>{
+          
+            console.log(student.checkingIn);
         });
-        */
       },
       handleCurrentChange(val) {
         this.page = val;
@@ -383,7 +378,7 @@
           students: []
         };
       },
-      getShiftStudents(shiftId,type){
+      getShiftStudents(shiftId,type,callback){
         let para = {
           id: shiftId,
         };
@@ -394,14 +389,9 @@
             if(type==='EDIT'){
               this.detailForm.students = res.data;
             }else{
-              res.data.forEach(item=>{
-                debugger;
-                if(!item.checkingIn){
-                  item.checkingIn='NORMAL';
-                }
-              });
-              this.attendanceForm.students = res.data;
-
+              if(callback){
+                callback(res.data);
+              }
             }
             
           }
@@ -415,7 +405,7 @@
         let para = {
           typeCode: 'ATTENDANCE-TYPE',
         };
-        getAttendanceTypes(para).then((res) => {
+        getDictionaryList(para).then((res) => {
           if( res && res.data){
             this.attendanceTypes = res.data;
           }
@@ -447,12 +437,17 @@
       },
       //显示考勤页面
       handleAttendance: function(index,row){
-        this.attendanceFormVisible = true;
-        this.clearFormData();
-        this.attendanceForm = Object.assign({}, row);
-        this.attendanceForm.trainTime=this.turnTimeSpanToArray(row.trainDate,row.trainTime);
+        let selRow=row;
+        let self=this;
+        
         //取排班学生
-        this.getShiftStudents(row.id,'ATTENDANCE');
+        this.getShiftStudents(row.id,'ATTENDANCE',function(data){
+          selRow.students=data;
+          self.attendanceForm = Object.assign({}, selRow);
+          self.attendanceForm.trainTime=self.turnTimeSpanToArray(selRow.trainDate,selRow.trainTime);
+          self.attendanceFormVisible = true;
+        });
+        
       },
     
       //编辑
@@ -512,6 +507,10 @@
       selsChange: function (sels) {
         this.sels = sels;
       },
+      attendanceStudentSelsChange: function (sels) {
+        this.attendanceStudentSels = sels;
+      },
+
       //批量删除
       batchRemove: function () {
         var ids = this.sels.map(item => item.id).toString();
@@ -535,6 +534,10 @@
           this.listLoading = false;
         });
       }
+    },
+    created(){
+　　　 //如果没有这句代码，select中初始化会是空白的，默认选中就无法实现
+      this.couponSelected = this.couponList[0].id;
     },
     mounted() {//默认页面加截方法
       this.getShifts();

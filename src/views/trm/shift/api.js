@@ -29,7 +29,7 @@ export const batchDeleteShifts = params =>{
 	return axios.post(`/Shift/batchDelete`, par).then(res => res.data); 
 };
 
-export const getAttendanceTypes = params =>{
+export const getDictionaryList = params =>{
 	return axios.get(`/Dictionary/list`, {params:{params:params}}).then(res => res.data); 
 };
 
